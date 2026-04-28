@@ -174,6 +174,7 @@ function mousePressed() {
     }else if (gameState === "NAVE") handleNaveClick(); // Chamamos a nova função da nave
     else if (gameState === "TAREFA1") mousePressedTarefa1();
     else if (gameState === "TAREFA2") mousePressedTarefa2();
+    else if (gameState === "TAREFA3") mousePressedTarefa3();
 }
 
 function keyPressed() {
