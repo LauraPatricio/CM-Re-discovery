@@ -98,10 +98,16 @@ function configurarBotoesNave() {
     } else if (personagemAtual === "ARPEGIUS") {
         btnNave.btnCrescendolls = true;
         btnNave.btnSuper = true;
+    } else if (personagemAtual === "OCTAVE") {
+        // --- ADICIONADO AQUI: Liga os botões do Octave ---
+        btnNave.btnSome = true;
+        btnNave.btnVoyager = true;
+    } else if (personagemAtual === "STELLA") {
+        // --- ADICIONADO AQUI: Já fica pronto para a Stella! ---
+        btnNave.btnVeridis = true;
+        btnNave.btnOne = true;
     }
-    // Continuar para os outros personagens...
 }
-
 
 // Verifica se o personagem terminou as suas duas tarefas
 //Corrigir ordem das tarefas depois 
@@ -131,8 +137,7 @@ function verificarProgressoNave() {
     else if (personagemAtual === "STELLA") {
         if (TarefaConcluida.veridis && TarefaConcluida.one) {
             personagensStatus.stella = true;
-            goTo("MENU_PERSONAGENS");
-            personagemAtual = "";
+          goTo("VITORIA");
         }
     }
 
@@ -165,19 +170,19 @@ function handleNaveClick() {
         goTo("TAREFA4");
     }
 
-    // if (btnNave.btnSome && !TarefaConcluida.some && clickBtn(width / 5, height / 2)) {
-    //     goTo("TAREFA5");
-    // }
+    if (btnNave.btnSome && !TarefaConcluida.some && clickBtn(width / 5, height / 2)) {
+        goTo("TAREFA5");
+    }
 
-    // if (btnNave.btnVoyager && !TarefaConcluida.voyager && clickBtn(width / 6, height / 2)) {
-    //     goTo("TAREFA6");
-    // }
+    if (btnNave.btnVoyager && !TarefaConcluida.voyager && clickBtn(width / 6, height / 2)) {
+        goTo("TAREFA6");
+    }
 
-    // if (btnNave.btnVeridis && !TarefaConcluida.veridis && clickBtn(width / 7, height / 2)) {
-    //     goTo("TAREFA7");
-    // }
+    if (btnNave.btnVeridis && !TarefaConcluida.veridis && clickBtn(width / 7, height / 2)) {
+        goTo("TAREFA7");
+    }
 
-    //   if (btnNave.btnOne && !TarefaConcluida.one && clickBtn(width / 8, height / 2)) {
-    //     goTo("TAREFA8");
-    // }
+      if (btnNave.btnOne && !TarefaConcluida.one && clickBtn(width / 8, height / 2)) {
+        goTo("TAREFA8");
+    }
 }

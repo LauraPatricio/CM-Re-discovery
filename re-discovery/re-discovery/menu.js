@@ -28,6 +28,8 @@ function preload() {
     preloadTarefa2();
     preloadTarefa3();
     preloadTarefa4();
+    preloadTarefa5();
+    preloadTarefa6();
 }
 // ── Setup ─────────────────────────────────────
 function setup() {
@@ -38,15 +40,17 @@ function setup() {
     setupTarefa2();
     setupTarefa3();
     setupTarefa4();
+    setupTarefa5();
+    setupTarefa6();
 }
 
 function calcularPopUpWide() {
-  widePopW = width  * 0.75;
+  widePopW = width  * 0.65;
   widePopH = widePopW * (WIDE_HEIGHT / WIDE_WIDTH);
 
   // Se a altura ultrapassar o ecrã, escala pela altura
-  if (widePopH > height * 0.8) {
-    widePopH = height * 0.8;
+  if (widePopH > height * 0.65) {
+    widePopH = height * 0.65;
     widePopW = widePopH * (WIDE_WIDTH / WIDE_HEIGHT);
   }
 
@@ -95,17 +99,18 @@ function draw() {
         drawMenuPersonagens();
     } else if (gameState === "NAVE") {
         drawNave();
-    }
-    else if (gameState === "TAREFA1") {
+    }else if (gameState === "TAREFA1") {
         drawTarefa1();
-    }
-    else if (gameState === "TAREFA2") {
+    }else if (gameState === "TAREFA2") {
         drawTarefa2();
-    }
-    else if (gameState === "TAREFA3") {
+    }else if (gameState === "TAREFA3") {
         drawTarefa3();
     } else if (gameState === "TAREFA4") {
         drawTarefa4();
+    } else if (gameState === "TAREFA5") {
+        drawTarefa5();
+    }else if (gameState === "TAREFA6") {
+        drawTarefa6();
     }
     handleTransition();
 }
@@ -208,6 +213,10 @@ function mousePressed() {
         mousePressedTarefa3();
     } else if (gameState === "TAREFA4") {
         mousePressedTarefa4();
+    } else if (gameState === "TAREFA5") {
+        mousePressedTarefa5();
+    } else if (gameState === "TAREFA6") {
+        mousePressedTarefa6();
     }
 }
 
@@ -218,4 +227,12 @@ function keyPressed() {
     else if (gameState === "TAREFA4") {
         keyPressedTarefa4();
     }
+    else if (gameState === "TAREFA5") {
+        keyPressedTarefa5();
+    }
 }
+
+function mouseReleased() {
+    mouseReleasedTarefa6();
+}
+

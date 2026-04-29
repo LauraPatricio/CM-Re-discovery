@@ -1,86 +1,74 @@
-let bgImg;
-let rocketImg;
-let isDragging = false;
-let gameStatus = "START"; 
-let pathPoints = [];
+let bgImg6;
+let rocketImg6;
+let isDragging6 = false;
+let tarefa6State = "START"; 
+let pathPoints6 = [];
 
-// The detection buffer for the coordination challenge 
-const tolerance = 30; 
+// O buffer de deteção (reduzido de 30 para 25 para combinar com a nova janela)
+const tolerance6 = 25; 
 
-function preload() {
-  bgImg = loadImage('tarefa6.png');
-  rocketImg = loadImage('rocket.png');
+function preloadTarefa6() {
+  bgImg6 = loadImage('imagens/tarefa6.png');
+  rocketImg6 = loadImage('imagens/rocket.png');
 }
 
-function setup() {
-  createCanvas(1024, 576); 
-  
-  // checkpoints do caminhos com tolerancia de 30
-  pathPoints = [
-    { x: 180, y: 300 }, 
-    { x: 180, y: 250 }, 
-    { x: 200, y: 215 },
-    { x: 230, y: 170 },  
-    { x: 270, y: 160 }, 
-    { x: 300, y: 210 }, 
-    { x: 300, y: 260 },
-    { x: 300, y: 300 },
-    { x: 290, y: 330 },   
-    { x: 280, y: 370 }, 
-    { x: 300, y: 420 }, 
-    { x: 330, y: 430 }, 
-    { x: 370, y: 400 }, 
-    { x: 400, y: 370 }, 
-    { x: 420, y: 340 }, 
-    { x: 450, y: 300 }, 
-    { x: 490, y: 260 }, 
-    { x: 520, y: 230 }, 
-    { x: 570, y: 210 }, 
-    { x: 600, y: 230 }, 
-    { x: 590, y: 270 }, 
-    { x: 580, y: 300 }, 
-    { x: 580, y: 340 }, 
-    { x: 630, y: 330 }, 
-    { x: 660, y: 300 }, 
-    { x: 700, y: 280 },
-    { x: 740, y: 280 }   
+function setupTarefa6() {
+  // Pontos exatos já recalculados manualmente para o ecrã virtual 800x450!
+  pathPoints6 = [
+    { x: 140.6, y: 234.4 }, { x: 140.6, y: 195.3 }, { x: 156.3, y: 168.0 },
+    { x: 179.7, y: 132.8 }, { x: 210.9, y: 125.0 }, { x: 234.4, y: 164.1 },
+    { x: 234.4, y: 203.1 }, { x: 234.4, y: 234.4 }, { x: 226.6, y: 257.8 },
+    { x: 218.8, y: 289.1 }, { x: 234.4, y: 328.1 }, { x: 257.8, y: 335.9 },
+    { x: 289.1, y: 312.5 }, { x: 312.5, y: 289.1 }, { x: 328.1, y: 265.6 },
+    { x: 351.6, y: 234.4 }, { x: 382.8, y: 203.1 }, { x: 406.3, y: 179.7 },
+    { x: 445.3, y: 164.1 }, { x: 468.8, y: 179.7 }, { x: 460.9, y: 210.9 },
+    { x: 453.1, y: 234.4 }, { x: 453.1, y: 265.6 }, { x: 492.2, y: 257.8 },
+    { x: 515.6, y: 234.4 }, { x: 546.9, y: 218.8 }, { x: 578.1, y: 218.8 }
   ];
 }
 
-function draw() {
-  background(0);
-  imageMode(CORNER);
-  image(bgImg, 0, 0, width, height);
+function drawTarefa6() {
+  // ── EFEITO POP-UP ──
+  image(bgNave, 0, 0, width, height); 
   
- // drawDebugPath();
+  noStroke();
+  fill(0, 0, 0, 180);
+  rect(0, 0, width, height); 
 
-  if (gameStatus === "START") {
-    drawOverlay("VOYAGER", "Hold the mouse to guide the rocket to the planet.");
-    drawRocket(pathPoints[0].x, pathPoints[0].y);
+  // ── ESCALA PARA O POP-UP WIDESCREEN ──
+  push();
+  translate(widePopX, widePopY);
+  scale(widePopW / WIDE_WIDTH, widePopH / WIDE_HEIGHT);
+
+  imageMode(CORNER);
+  image(bgImg6, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
+  
+  // Se quiseres ver a linha guia, retira as duas barras "//" na linha abaixo:
+  // drawDebugPath6(); 
+
+  if (tarefa6State === "START") {
+    drawOverlay6("VOYAGER", "Hold the mouse to guide the rocket to the planet.");
+    drawRocket6(pathPoints6[0].x, pathPoints6[0].y);
   } 
-  else if (gameStatus === "PLAYING") {
-    updateGame();
+  else if (tarefa6State === "PLAYING") {
+    updateGame6();
   } 
-  else if (gameStatus === "FAIL") {
-    drawOverlay("STRAYED FROM PATH", "Click the start to try again!");
+  else if (tarefa6State === "FAIL") {
+    drawOverlay6("STRAYED FROM PATH", "Click the start to try again!");
+    drawRocket6(pathPoints6[0].x, pathPoints6[0].y);
   } 
-  else if (gameStatus === "WIN") {
-    drawOverlay("MEMORY RECOVERED", "You've broken the transe!");
+  else if (tarefa6State === "WIN") {
+    drawOverlay6("MEMORY RECOVERED", "You've broken the trance!");
   }
 
-  //fill(255);
-  //noStroke();
-  //textAlign(LEFT, BOTTOM);
-  //textSize(14);
-  //text(`Mouse X: ${floor(mouseX)}, Y: ${floor(mouseY)}`, 10, height - 10);
+  pop(); // Fim da escala
 }
 
-// funçao de debug pra ver os checkpoints 
-function drawDebugPath() {
-  for (let p of pathPoints) {
+function drawDebugPath6() {
+  for (let p of pathPoints6) {
     noFill();
     stroke(255, 0, 0, 100); 
-    circle(p.x, p.y, tolerance * 2);
+    circle(p.x, p.y, tolerance6 * 2);
     
     fill(255, 0, 0);
     noStroke();
@@ -88,64 +76,86 @@ function drawDebugPath() {
   }
 }
 
-function updateGame() {
-  if (isDragging) {
+function updateGame6() {
+  if (isDragging6) {
+    // Cálculo do rato virtual devido à escala da janela
+    let virtualMouseX = (mouseX - widePopX) / (widePopW / WIDE_WIDTH);
+    let virtualMouseY = (mouseY - widePopY) / (widePopH / WIDE_HEIGHT);
+
     let minD = 1000;
-    //ver qual é o checkpoint mais perto do rato
-    for (let p of pathPoints) {
-      let d = dist(mouseX, mouseY, p.x, p.y);
+    // ver qual é o checkpoint mais perto do rato
+    for (let p of pathPoints6) {
+      let d = dist(virtualMouseX, virtualMouseY, p.x, p.y);
       if (d < minD) minD = d;
     }
 
-    if (minD > tolerance) {
-      gameStatus = "FAIL";
-      isDragging = false;
+    // Se fugires da linha guia
+    if (minD > tolerance6) {
+      tarefa6State = "FAIL";
+      isDragging6 = false; 
     }
 
-    //qnd chega ao final
-    let endPoint = pathPoints[pathPoints.length - 1];
-    if (dist(mouseX, mouseY, endPoint.x, endPoint.y) < 10) {
-      gameStatus = "WIN";
-      isDragging = false;
+    // Quando chega ao final
+    let endPoint = pathPoints6[pathPoints6.length - 1];
+    if (dist(virtualMouseX, virtualMouseY, endPoint.x, endPoint.y) < 25) {
+      tarefa6State = "WIN";
+      isDragging6 = false;
+      
+      // --- VITÓRIA E DESBLOQUEIO ---
+      TarefaConcluida.voyager = true; 
+      setTimeout(() => {
+          goTo("NAVE");
+          resetGame6();
+      }, 1500);
     }
 
-    drawRocket(mouseX, mouseY);
+    drawRocket6(virtualMouseX, virtualMouseY);
   }
 }
 
-function drawRocket(x, y) {
+function drawRocket6(x, y) {
   imageMode(CENTER);
-  image(rocketImg, x, y, 60, 60);
+  image(rocketImg6, x, y, 60, 60);
 }
 
-//efeitos visuais
-function drawOverlay(title, subtitle) {
+function drawOverlay6(title, subtitle) {
   fill(0, 0, 0, 180);
-  rect(0, 0, width, height);
+  rect(0, 0, WIDE_WIDTH, WIDE_HEIGHT);
   
   textAlign(CENTER, CENTER);
   fill(0, 255, 255); 
   textSize(40);
-  text(title, width / 2, height / 2 - 30);
+  text(title, WIDE_WIDTH / 2, WIDE_HEIGHT / 2 - 30);
   
   fill(255);
   textSize(20);
-  text(subtitle, width / 2, height / 2 + 30);
+  text(subtitle, WIDE_WIDTH / 2, WIDE_HEIGHT / 2 + 30);
 }
 
-function mousePressed() {
-  if (gameStatus === "START" || gameStatus === "FAIL") {
-    if (dist(mouseX, mouseY, pathPoints[0].x, pathPoints[0].y) < 100) {
-      gameStatus = "PLAYING";
-      isDragging = true;
+function mousePressedTarefa6() {
+  let virtualMouseX = (mouseX - widePopX) / (widePopW / WIDE_WIDTH);
+  let virtualMouseY = (mouseY - widePopY) / (widePopH / WIDE_HEIGHT);
+
+  if (tarefa6State === "START" || tarefa6State === "FAIL") {
+    // Verifica se clica perto da base do foguetão para arrancar
+    if (dist(virtualMouseX, virtualMouseY, pathPoints6[0].x, pathPoints6[0].y) < 100) {
+      tarefa6State = "PLAYING";
+      isDragging6 = true;
     }
-  } else if (gameStatus === "PLAYING") {
-    isDragging = true;
+  } else if (tarefa6State === "PLAYING") {
+    isDragging6 = true;
   }
 }
 
-function mouseReleased() {
-  if (gameStatus === "PLAYING") {
-    isDragging = false;
+function mouseReleasedTarefa6() {
+  if (tarefa6State === "PLAYING") {
+    // Se o jogador largar o rato a meio do caminho, falha a missão!
+    tarefa6State = "FAIL";
+    isDragging6 = false;
   }
+}
+
+function resetGame6() {
+  tarefa6State = "START";
+  isDragging6 = false;
 }
