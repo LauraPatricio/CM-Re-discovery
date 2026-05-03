@@ -6,10 +6,13 @@ let startBtn, aboutBtn;
 let scaleRatioMenu, scaleRatioQuarto, scaleRatioNave;
 let naveNewW, naveNewH, menuNewW, menuNewH, quartoNewW, quartoNewH;
 
-// Variáveis da transição (fade a preto)
+// Variáveis da transição (fade a preto e noise)
 let fadeAlpha = 0;
 let isFading = false;
 let nextState = "";
+let transitionType = "NONE"; // Começa sem transição
+let noiseDuration = 30;      // Duração da estática (30 frames = aprox. meio segundo)
+let noiseCounter = 0;
 
 // Proporção popup
 let widePopX, widePopY, widePopW, widePopH;
@@ -73,16 +76,19 @@ function drawUniversalExit() {
     let px, py, pw;
 
     // Ajusta o botão com base na tarefa em que estamos
-    if (gameState === "TAREFA1") { px = popX ; py = popY; pw = popW; }
+    if (gameState === "TAREFA1") { px = popX; py = popY; pw = popW; }
     else if (gameState === "TAREFA2") { px = t2_popX; py = t2_popY; pw = t2_popW; }
     else { px = widePopX; py = widePopY; pw = widePopW; }
 
-    let size = width * 0.025; // Tamanho responsivo do botão
-    let ex = px + pw + 8;        // Posição X (Canto superior direito)
-    let ey = py;             // Posição Y (Canto superior direito)
+    // --- CORREÇÃO: Variáveis uniformizadas ---
+    let size = width * 0.025; 
+    let ex = px + pw + 25; // Posição X com o ajuste de + 8        
+    let ey = py;          
 
     push();
-    // Efeito de passar o rato por cima (Hover)
+    imageMode(CENTER);
+
+    // Efeito de passar o rato por cima (Hover) usa exatamente as mesmas variáveis
     if (dist(mouseX, mouseY, ex, ey) < size / 2) {
         cursor(HAND);
         tint(255, 150, 150); // Fica ligeiramente vermelho
@@ -98,15 +104,16 @@ function checkUniversalExit() {
     else if (gameState === "TAREFA2") { px = t2_popX; py = t2_popY; pw = t2_popW; }
     else { px = widePopX; py = widePopY; pw = widePopW; }
 
-    let size = width * 0.03;
-    let ex = px + pw;
+    // --- CORREÇÃO: Variáveis copiadas do drawUniversalExit para baterem certo ---
+    let size = width * 0.025; 
+    let ex = px + pw + 25; // Adicionado o + 8 que faltava!
     let ey = py;
 
     // Se o clique foi em cima da bola de Exit
     if (dist(mouseX, mouseY, ex, ey) < size / 2) {
-        resetCurrentTask(); // Limpa o jogo antes de sair
-        goTo("NAVE");       // Volta à nave
-        return true;        // Confirma que o clique foi processado
+        resetCurrentTask(); 
+        goTo("NAVE");       
+        return true;        
     }
     return false;
 }
@@ -175,7 +182,7 @@ function initButtons() {
 
 // ── Loop principal ────────────────────────────
 function draw() {
-    if (!isFading) cursor(ARROW);
+    if (transitionType !== "NOISE" && !isFading) cursor(ARROW);
 
     if (gameState === "MENU") {
         drawMenu();
@@ -218,7 +225,6 @@ function draw() {
 function drawMenu() {
     let sizelogo = windowWidth / 2600;
 
-    // --- CORREÇÃO: menuNewHnewH alterado para menuNewH ---
     image(bgMenu, 0, 0, menuNewW, menuNewH);
     
     push();
@@ -262,33 +268,75 @@ function drawButton(btn) {
     pop();
 }
 
-// ── Transição (fade a preto) ──────────────────
-let transitionType = "FADE"; 
-let noiseDuration = 45;      
-let noiseCounter = 0;
+// ── Sistema Dinâmico de Transições ──────────────────
+// --- NOVO: Função goTo atualizada para gerir múltiplos efeitos ---
+function goTo(novoEstado, tipo = "NONE") {
+    nextState = novoEstado;
+    transitionType = tipo;
 
-function goTo(novoEstado) {
-    gameState = novoEstado; 
+    if (tipo === "FADE") {
+        isFading = true;
+    } 
+    else if (tipo === "NOISE") {
+        noiseCounter = 0; // Reinicia o relógio do noise
+    } 
+    else {
+        // Sem transição definida, muda de imediato
+        gameState = novoEstado; 
+    }
 }
 
 function handleTransition() {
-    if (isFading) {
-        fadeAlpha += 5; 
-        if (fadeAlpha >= 255) {
-            gameState = nextState;
-            isFading = false;
+    // 1. Transição: Fade a Preto
+    if (transitionType === "FADE" || isFading) {
+        if (isFading) {
+            fadeAlpha += 10; 
+            if (fadeAlpha >= 255) {
+                gameState = nextState;
+                isFading = false;
+            }
+        } else if (fadeAlpha > 0) {
+            fadeAlpha -= 10; 
+            if (fadeAlpha <= 0) {
+                transitionType = "NONE";
+            }
         }
-    } else if (fadeAlpha > 0) {
-        fadeAlpha -= 5; 
+        push();
+        noStroke();
+        fill(0, fadeAlpha);
+        rect(0, 0, width, height);
+        pop();
     }
+    // 2. Transição: Estática de TV (Noise)
+    else if (transitionType === "NOISE") {
+        noiseCounter++;
+        
+        push();
+        noStroke();
+        let pixelSize = 5; // Tamanho do "grão" da TV. Aumentar se o PC ficar lento.
+        
+        for (let x = 0; x < width; x += pixelSize) {
+            for (let y = 0; y < height; y += pixelSize) {
+                // Sorteia um tom de cinza/preto/branco para cada quadrado
+                fill(random(255)); 
+                rect(x, y, pixelSize, pixelSize);
+            }
+        }
+        pop();
 
-    fill(0, fadeAlpha);
-    rect(0, 0, width, height);
+        // Quando atingir a duração definida, faz a troca e desliga a transição
+        if (noiseCounter >= noiseDuration) {
+            gameState = nextState;
+            transitionType = "NONE"; 
+            noiseCounter = 0;
+        }
+    }
 }
 
 // ── Input ─────────────────────────────────────
 function mousePressed() {
-    if (isFading) return; 
+    // Ignora cliques enquanto houver uma transição a decorrer
+    if (transitionType !== "NONE" || isFading) return; 
 
     if (gameState.startsWith("TAREFA")) {
         if (checkUniversalExit()) return; 
@@ -301,8 +349,9 @@ function mousePressed() {
         ) {
             let fs = fullscreen();
             fullscreen(!fs);
-            nextState = "QUARTO";
-            isFading = true;
+            
+            // --- ATUALIZADO: Agora usamos a função goTo para o Fade ---
+            goTo("QUARTO", "FADE"); 
         }
     }
     else if (gameState === "QUARTO") {

@@ -31,8 +31,12 @@ function preloadNave() {
 
 function drawNave() {
     background(0);
-    push(); // <-- ABRE AQUI O BLOCO DA ESCALA
+    let larguraEscalada = bgNave.width * scaleRatioNave;
+    let centroX = (width - larguraEscalada) / 2;
+    push(); 
+    translate(centroX, 0); 
     scale(scaleRatioNave);
+    
     imageMode(CORNER);
     image(bgNave, 0, 0);
 
@@ -56,20 +60,19 @@ function drawNave() {
  */
 function drawBtnImagem(x, y, isUnlocked, isConcluded, imgLine, imgHover, imgConc) {
 
-    // --- NOVO: Fator de Ajuste de Tamanho ---
-    // 1.0 = tamanho original. 1.015 = 1.5% maior. 1.5 = 50% maior. 0.8 = 20% mais pequeno.
-    // Podes alterar este número livremente até os botões ficarem perfeitos visualmente!
     let fatorAjuste = 1.22;
-
-    // Calculamos a largura (w) e altura (h) multiplicadas pelo nosso fator
     let w = imgLine.width * fatorAjuste;
     let h = imgLine.height * fatorAjuste;
 
-    // O rato virtual (mantém-se igual, ele entende o zoom do ecrã)
-    let virtualMouseX = mouseX / scaleRatioNave;
-    let virtualMouseY = mouseY / scaleRatioNave;
+    // --- CORREÇÃO AQUI: O Rato Virtual precisa de saber o centroX! ---
+    let larguraEscalada = bgNave.width * scaleRatioNave;
+    let centroX = (width - larguraEscalada) / 2;
 
-    // A área de colisão agora usa a nova largura (w) e altura (h) ajustadas
+    // Subtraímos o centroX ao mouseX para compensar o empurrão do ecrã
+    let virtualMouseX = (mouseX - centroX) / scaleRatioNave;
+    let virtualMouseY = mouseY / scaleRatioNave;
+    // ------------------------------------------------------------------
+
     let over = virtualMouseX > x - w / 2 && virtualMouseX < x + w / 2 && virtualMouseY > y - h / 2 && virtualMouseY < y + h / 2;
 
     push();
@@ -86,11 +89,8 @@ function drawBtnImagem(x, y, isUnlocked, isConcluded, imgLine, imgHover, imgConc
             image(imgLine, x, y, w, h);
         }
     }
-
-
     pop();
 }
-
 // Configura quais botões aparecem dependendo do personagem
 function configurarBotoesNave() {
     for (let key in btnNave) { btnNave[key] = false; }
@@ -129,31 +129,32 @@ function verificarProgressoNave() {
     }
     else if (personagemAtual === "STELLA" && TarefaConcluida.some && TarefaConcluida.one) {
         personagensStatus.stella = true;
-        goTo("VITORIA");
+        goTo("MENU_PERSONAGENS");
     }
 }
 
 // Lógica de clique na Nave com tamanhos automáticos e rato virtual
 function handleNaveClick() {
 
-    let virtualMouseX = mouseX / scaleRatioNave;
+    // --- CORREÇÃO AQUI: O Clique também precisa de saber o centroX! ---
+    let larguraEscalada = bgNave.width * scaleRatioNave;
+    let centroX = (width - larguraEscalada) / 2;
+
+    // Subtraímos o centroX ao mouseX
+    let virtualMouseX = (mouseX - centroX) / scaleRatioNave;
     let virtualMouseY = mouseY / scaleRatioNave;
+    // ------------------------------------------------------------------
 
     function clickBtn(x, y, img) {
-        // --- NOVO: O clique também precisa de saber o fator de ajuste! ---
-        // Tem de ser exatamente o mesmo número que usaste no drawBtnImagem acima.
-        let fatorAjuste = 1.22;
-
+        let fatorAjuste = 1.22; // Tem de ser igual ao do drawBtnImagem
         let w = img.width * fatorAjuste;
         let h = img.height * fatorAjuste;
 
         return virtualMouseX > x - w / 2 && virtualMouseX < x + w / 2 && virtualMouseY > y - h / 2 && virtualMouseY < y + h / 2;
     }
 
-    // Os teus botões com as posições originais.
-    if (btnNave.btnVoyager && !TarefaConcluida.voyager && clickBtn(699, 805, buttonLine["Voyager"])){
-     goTo("TAREFA6");   
-    } 
+    // Verificações de clique
+    if (btnNave.btnVoyager && !TarefaConcluida.voyager && clickBtn(699, 805, buttonLine["Voyager"])) goTo("TAREFA6");
     if (btnNave.btnCrescendolls && !TarefaConcluida.crescendolls && clickBtn(1090, 906, buttonLine["Crescendolls"])) goTo("TAREFA3");
     if (btnNave.btnAerodynamic && !TarefaConcluida.aerodynamic && clickBtn(1180, 909, buttonLine["Aerodynamic"])) goTo("TAREFA1");
     if (btnNave.btnHarder && !TarefaConcluida.harder && clickBtn(946, 830, buttonLine["Harder"])) goTo("TAREFA2");

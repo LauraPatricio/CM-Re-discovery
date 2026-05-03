@@ -53,7 +53,7 @@ function handleQuartoClick() {
 
     if (mouseX > ox - ow / 2 && mouseX < ox + ow / 2 &&
         mouseY > oy - oh / 2 && mouseY < oy + oh / 2) {
-        goTo("LIVRO");
+        goTo("LIVRO","NOISE");
     }
 }
 
