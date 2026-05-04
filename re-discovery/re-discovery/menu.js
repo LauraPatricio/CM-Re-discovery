@@ -125,10 +125,17 @@ function resetCurrentTask() {
     } else if (gameState === "TAREFA2") {
         tarefa2State = 'MEMORIZE';
         loseTimer = 0;
-        playerSequence = [];
+        playerSequence2 = []; // Corrigido para bater com o seu nome de variável
         sequenceIndex = 0;
         displayWord = "";
-    } else if (gameState === "TAREFA3") { resetGame3(); }
+    } else if (gameState === "TAREFA3") { 
+        // 1. Stop the music
+        if (som3 && som3.isPlaying()) {
+            som3.stop();
+        }
+        // 2. Reset variables (now safe because resetGame3 no longer calls play())
+        resetGame3(); 
+    }
     else if (gameState === "TAREFA4") { resetGame4(); }
     else if (gameState === "TAREFA5") { resetGame5(); }
     else if (gameState === "TAREFA6") { resetGame6(); }
@@ -274,14 +281,20 @@ function goTo(novoEstado, tipo = "NONE") {
     nextState = novoEstado;
     transitionType = tipo;
 
+    // --- NEW LOGIC FOR TAREFA 3 START ---
+    if (novoEstado === "TAREFA3") {
+        if (som3 && som3.isLoaded()) {
+            som3.loop();
+        }
+    }
+
     if (tipo === "FADE") {
         isFading = true;
     } 
     else if (tipo === "NOISE") {
-        noiseCounter = 0; // Reinicia o relógio do noise
+        noiseCounter = 0; 
     } 
     else {
-        // Sem transição definida, muda de imediato
         gameState = novoEstado; 
     }
 }

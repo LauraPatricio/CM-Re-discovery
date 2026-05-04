@@ -75,19 +75,10 @@ function drawTarefa4() {
 }
 
 function displayHUD4() {
-<<<<<<< HEAD
   textFont('Impact');
   fill(0, 255, 255);
   textSize(24);
   text(`SUPERPOWER CHARGED: ${score4} / ${GOAL4}`, 60, 60);
-=======
-  fill(0, 255, 255);
-  noStroke();
-  textAlign(LEFT);
-  textSize(24);
-  text(`Superpower Charged: ${score4} / ${GOAL4}`, 60, 60);
-
->>>>>>> 84d8ad85803208393417849f759bc966fe16bb0d
   fill(255, 50, 50);
   text(`SHIELDS: ${"❤️".repeat(lives4)}`, 60, 90);
 }

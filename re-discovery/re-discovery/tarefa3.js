@@ -1,28 +1,32 @@
-let bgImg3; // Renomeado para evitar conflitos
+let bgImg3;
 let player3;
 let obstacles3 = [];
 let tarefa3State = 'PLAY';
+let som3; // Variável para a música
 
-// Dimensões virtuais do jogo (A física usa isto, não alteres)
+// Timestamps em segundos onde o "Hey" acontece na música
+// Ajustados conforme o ritmo de 'Crescendolls'
+let heyTimes = [0.8, 2.3, 3.8, 5.3, 6.8, 8.3, 9.8, 11.3, 12.8, 14.3];
+let nextHeyIndex = 0;
+
 let groundLevel3 = 342;
 let gameSpeed3 = 5;
-
-// Variáveis de pontuação
 let score3 = 0;
 const GOAL3 = 10;
 
-
-
 function preloadTarefa3() {
     bgImg3 = loadImage('imagens/tarefa3.png');
+    // Certifique-se de que o caminho e nome do arquivo de áudio estejam corretos
+    som3 = loadSound('sons/crescendolls.mp3'); 
 }
 
 function setupTarefa3() {
     player3 = new Player3();
+    nextHeyIndex = 0;
+   
 }
 
 function drawTarefa3() {
-    // ── EFEITO POP-UP ──
     push();
     imageMode(CENTER);
     image(bgNave, width / 2, height / 2, naveNewW, naveNewH);
@@ -30,52 +34,54 @@ function drawTarefa3() {
     
     noStroke();
     fill(0, 0, 0, 180);
-    rect(0, 0, width, height); // Película escura
+    rect(0, 0, width, height);
 
-    // ── O TRUQUE DE MESTRE DA ESCALA ──
     push();
-    // Movemos o ponto de origem (0,0) para o canto do pop-up
     translate(widePopX, widePopY);
-    // Encolhemos ou esticamos tudo o que desenhar para caber no popW / popH
     scale(widePopW / WIDE_WIDTH, widePopH / WIDE_HEIGHT);
 
-    // A partir daqui, programamos como se o ecrã tivesse exatamente 800x500!
     imageMode(CORNER);
     image(bgImg3, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
 
     if (tarefa3State === 'PLAY') {
-        player3.update();
+    // Start music if it's not playing and we are in the PLAY state
+    if (som3 && som3.isLoaded() && !som3.isPlaying()) {
+        som3.loop();
+    }
+    
+    player3.update();
         player3.show();
-
         displayScore3();
 
-        if (obstacles3.length === 0 || (WIDE_WIDTH - obstacles3[obstacles3.length - 1].x) > random(250, 500)) {
-            obstacles3.push(new Obstacle3());
+        let currentTime = som3.currentTime();
+
+        if (nextHeyIndex < heyTimes.length && currentTime >= heyTimes[nextHeyIndex]) {
+            obstacles3.push(new Obstacle3(true)); // Criar obstáculo do tipo "Hey"
+            nextHeyIndex++;
         }
 
         for (let i = obstacles3.length - 1; i >= 0; i--) {
             obstacles3[i].move();
             obstacles3[i].show();
 
-            // Verifica se o jogador saltou com sucesso
             if (!obstacles3[i].passed && obstacles3[i].x + obstacles3[i].w < player3.x) {
                 score3++;
                 obstacles3[i].passed = true;
 
-                // --- CONDIÇÃO DE VITÓRIA ---
                 if (score3 >= GOAL3) {
                     tarefa3State = 'WIN';
-
-                    TarefaConcluida.crescendolls = true; // Avisa a nave (assumindo que a Tarefa 3 é a Crescendolls)se
+                    if (som3.isPlaying()) som3.stop(); // STOP IMMEDIATELY
+                    TarefaConcluida.crescendolls = true;
                     setTimeout(() => {
                         goTo("NAVE");
-                        resetGame3(); // Fica limpo para se o jogador quiser repetir depois
+                        resetGame3();
                     }, 1500);
                 }
             }
 
             if (player3.hits(obstacles3[i])) {
                 tarefa3State = 'GAMEOVER';
+                if (som3.isPlaying()) som3.stop(); // STOP IMMEDIATELY
             }
 
             if (obstacles3[i].offscreen()) {
@@ -83,12 +89,14 @@ function drawTarefa3() {
             }
         }
     } else if (tarefa3State === 'GAMEOVER') {
+        if (som3.isPlaying()) som3.stop(); // Garante paragem no erro
         showFailScreenUniform();
     } else if (tarefa3State === 'WIN') {
+        if (som3.isPlaying()) som3.stop(); // Garante paragem na vitória
         showWinScreenUniform();
     }
 
-    pop(); // Terminamos o truque da escala aqui!
+    pop();
 }
 
 function displayScore3() {
@@ -105,7 +113,6 @@ function showFailScreenUniform() {
     textFont('Impact');
     drawingContext.shadowBlur = 15;
     drawingContext.shadowColor = color(255, 0, 0);
-    
     fill(255, 0, 0);
     textSize(popW * 0.08);
     text("FAILED - TRY AGAIN", WIDE_WIDTH / 2, WIDE_HEIGHT / 2);
@@ -115,26 +122,20 @@ function showFailScreenUniform() {
 function showWinScreenUniform() {
     fill(0, 0, 0, 200);
     rect(0, 0, WIDE_WIDTH, WIDE_HEIGHT);
-    
     push();
     textAlign(CENTER, CENTER);
     textFont('Impact');
     drawingContext.shadowBlur = 15;
     drawingContext.shadowColor = color(0, 255, 100);
-    
     fill(0, 255, 100);
-    textSize(popW * 0.08); // Tamanho consistente com a Tarefa 1
+    textSize(popW * 0.08);
     text("IDENTITY RECOVERED", WIDE_WIDTH / 2, WIDE_HEIGHT / 2);
-    
-    noAlpha(); // Reset shadow
     textSize(popW * 0.03);
     fill(255);
     text("MEMORY SYNCED...", WIDE_WIDTH / 2, WIDE_HEIGHT / 2 + 60);
     pop();
 }
 
-
-// Em vez da genérica keyPressed, criamos uma específica
 function keyPressedTarefa3() {
     if (key === ' ' || keyCode === UP_ARROW) {
         if (tarefa3State === 'PLAY') {
@@ -148,11 +149,22 @@ function keyPressedTarefa3() {
 function resetGame3() {
     obstacles3 = [];
     score3 = 0;
+    nextHeyIndex = 0;
     tarefa3State = 'PLAY';
     player3 = new Player3();
+    
+    // STOP the music to reset it, but do NOT call play() here.
+    // This prevents the music from starting when you are trying to close the task.
+    if (som3 && som3.isLoaded()) {
+        som3.stop();
+    }
 }
 
-// Renomeámos as classes para não chocar com futuras tarefas que possam usar a palavra "Player"
+function mousePressedTarefa3() {
+    // This can stay empty if you only use the keyboard, 
+    // but the function MUST exist so menu.js doesn't crash.
+}
+
 class Player3 {
     constructor() {
         this.size = 35;
@@ -190,10 +202,11 @@ class Player3 {
 }
 
 class Obstacle3 {
-    constructor() {
+    constructor(isHey = false) {
         this.type = floor(random(0, 3));
         this.speed = gameSpeed3;
         this.passed = false;
+        this.isHey = isHey; // Marca se é um obstáculo de ritmo
 
         if (this.type === 0) {
             this.w = 30;
@@ -222,6 +235,14 @@ class Obstacle3 {
                 triangle(this.x, this.y + this.h, this.x + this.w / 2, this.y, this.x + this.w, this.y + this.h);
             } else {
                 rect(this.x, this.y, this.w, this.h);
+            }
+
+            // Desenhar o balão "Hey!" acima do obstáculo
+            if (this.isHey) {
+                textAlign(CENTER);
+                textSize(20);
+                fill(255, 255, 0); // Amarelo para destaque
+                text("Hey!", this.x + this.w / 2, this.y - 10);
             }
         }
     }

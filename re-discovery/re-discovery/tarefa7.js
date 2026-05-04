@@ -20,15 +20,11 @@ function setupTarefa7() {
 }
 
 function drawTarefa7() {
-<<<<<<< HEAD
-  image(bgNave, 0, 0, width, height); 
-=======
   push();
   imageMode(CENTER);
   image(bgNave, width / 2, height / 2, naveNewW, naveNewH);
   pop();
   
->>>>>>> 84d8ad85803208393417849f759bc966fe16bb0d
   noStroke();
   fill(0, 0, 0, 180);
   rect(0, 0, width, height); 
