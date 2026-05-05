@@ -1,30 +1,24 @@
 let bgImg4;
 let circles4 = [];
 let score4 = 0;
-let lives4 = 3;
+let lives4 = 3; 
 const GOAL4 = 10;
 let tarefa4State = 'PLAY';
+let som4; // Variável para a música
 
 function preloadTarefa4() {
-  bgImg4 = loadImage('imagens/tarefa4.png'); // Ajustado para a pasta imagens
+  bgImg4 = loadImage('imagens/tarefa4.png');
+  som4 = loadSound('sons/superheroes.mp3'); // Carrega a música da tarefa[cite: 15]
 }
 
-function setupTarefa4() {
-  // Já não precisamos de fazer contas aqui, o menu.js trata disso com o calcularPopUpWide!
-}
+function setupTarefa4() {}
 
 function drawTarefa4() {
-  // ── EFEITO POP-UP ──
-  push();
-  imageMode(CENTER);
-  image(bgNave, width / 2, height / 2, naveNewW, naveNewH);
-  pop();
-
+  image(bgNave, 0, 0, width, height); 
   noStroke();
   fill(0, 0, 0, 180);
-  rect(0, 0, width, height); // Película escura
+  rect(0, 0, width, height); 
 
-  // ── ESCALA PARA O POP-UP WIDESCREEN ──
   push();
   translate(widePopX, widePopY);
   scale(widePopW / WIDE_WIDTH, widePopH / WIDE_HEIGHT);
@@ -33,8 +27,14 @@ function drawTarefa4() {
   image(bgImg4, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
 
   if (tarefa4State === 'PLAY') {
+    // ── GESTÃO DA MÚSICA ──
+    if (som4.isLoaded() && !som4.isPlaying()) {
+      som4.loop();
+    }
+
     displayHUD4();
 
+    // Spawna círculos a cada 60 frames (aprox. 1 segundo, no ritmo da batida)
     if (frameCount % 60 === 0 && circles4.length < 3) {
       circles4.push(new ClickCircle4());
     }
@@ -45,33 +45,35 @@ function drawTarefa4() {
 
       if (circles4[i].isExpired()) {
         if (circles4[i].isClicked) {
-          score4++;
+          score4++; 
         } else {
-          lives4--;
-          if (lives4 <= 0) tarefa4State = 'GAMEOVER';
+          lives4--; 
+          if (lives4 <= 0) {
+            tarefa4State = 'GAMEOVER';
+            if (som4.isPlaying()) som4.stop(); // Para a música na derrota
+          }
         }
         circles4.splice(i, 1);
       }
     }
 
-    // --- CONDIÇÃO DE VITÓRIA ---
-    if (score4 >= GOAL4 && tarefa4State === 'PLAY') {
+    if (score4 >= GOAL4) {
       tarefa4State = 'WIN';
-
-      TarefaConcluida.super = true; // Avisa a nave que ganhámos a Tarefa 4 (Super)
+      if (som4.isPlaying()) som4.stop(); // Para a música na vitória[cite: 16]
+      TarefaConcluida.super = true; 
       setTimeout(() => {
-        goTo("NAVE");
-        resetGame4(); // Limpa as variáveis para se o user quiser repetir
+          goTo("NAVE");
+          resetGame4(); 
       }, 1500);
     }
-
+    
   } else if (tarefa4State === 'GAMEOVER') {
     showFailScreenUniform();
   } else if (tarefa4State === 'WIN') {
     showWinScreenUniform();
   }
-
-  pop(); // Fim da escala
+  
+  pop(); 
 }
 
 function displayHUD4() {
@@ -117,6 +119,8 @@ function showWinScreenUniform() {
     pop();
 }
 
+
+
 function mousePressedTarefa4() {
   if (tarefa4State === 'PLAY') {
     // --- MAGIA MATEMÁTICA ---
@@ -144,6 +148,10 @@ function resetGame4() {
   lives4 = 3;
   circles4 = [];
   tarefa4State = 'PLAY';
+  // Garante que a música para e faz reset[cite: 16]
+  if (som4 && som4.isLoaded()) {
+    som4.stop();
+  }
 }
 
 class ClickCircle4 {
@@ -151,8 +159,9 @@ class ClickCircle4 {
     this.x = random(100, WIDE_WIDTH - 100);
     this.y = random(120, WIDE_HEIGHT - 100);
     this.innerR = 40;
-    this.outerR = 150;
-    this.shrinkSpeed = 1.2;
+    this.outerR = 150; 
+    // Ajustado para fechar em aproximadamente 60 frames (1 segundo), batendo com o ritmo
+    this.shrinkSpeed = (this.outerR - this.innerR) / 60; 
     this.isClicked = false;
   }
 

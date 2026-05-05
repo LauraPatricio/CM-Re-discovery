@@ -1,6 +1,6 @@
 let bgImg2; // Renomeado para não chocar com o bg da Tarefa 1
 let buttonImages = {};
-let words = ["WORK", "MAKE", "IT", "DO", "HARDER", "BETTER", "FASTER", "STRONGER", "US"];
+let words = ["WORK IT", "MAKE IT", "DO IT", "MAKES US", "HARDER", "BETTER", "FASTER", "STRONGER"];
 let buttons2 = []; // Renomeado para evitar conflitos
 
 let correctSequence = [];
@@ -13,10 +13,15 @@ let loseTimer = 0;
 // ── VARIÁVEIS DO POP-UP DA TAREFA 2 ──
 let t2_popX, t2_popY, t2_popW, t2_popH;
 
+// No topo do ficheiro tarefa2.js
+let wordSounds = {}; 
+
 function preloadTarefa2() {
     bgImg2 = loadImage('imagens/tarefa2.png');
     for (let word of words) {
         buttonImages[word] = loadImage('imagens/' + word + '.png');
+        // Carrega o som correspondente a cada palavra (ex: imagens/BETTER.mp3)
+        wordSounds[word] = loadSound('sons/' + word + '.mp3'); 
     }
 }
 
@@ -99,6 +104,8 @@ function handleMemorizePhase() {
 
     if (frameCycle === 0 && sequenceIndex < correctSequence.length) {
         displayWord = correctSequence[sequenceIndex];
+        // Toca o som da palavra exibida
+        if (wordSounds[displayWord]) wordSounds[displayWord].play(); 
         sequenceIndex++;
     } else if (frameCycle === 60) {
         displayWord = "";
@@ -160,6 +167,8 @@ function mousePressedTarefa2() {
 
     for (let b of buttons2) {
         if (mouseX > b.x && mouseX < b.x + b.w && mouseY > b.y && mouseY < b.y + b.h) {
+            // Toca o som da palavra ao clicar
+            if (wordSounds[b.word]) wordSounds[b.word].play(); 
             checkInput(b.word);
             break;
         }
