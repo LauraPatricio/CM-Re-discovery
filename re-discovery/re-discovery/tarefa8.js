@@ -228,6 +228,7 @@ function showFinalWin() {
 }
 
 function resetTarefa8() {
+    tarefa8State = "INSTRUCTIONS"; // ADICIONAR ESTA LINHA AQUI!
     tarefa8phase = 1;
     sliderY = 270;
     rotationAngle = 0;

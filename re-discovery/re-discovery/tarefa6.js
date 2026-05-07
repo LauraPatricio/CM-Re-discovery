@@ -188,6 +188,6 @@ function mouseReleasedTarefa6() {
 }
 
 function resetGame6() {
-  tarefa6State = "START";
+  tarefa6State = "INSTRUCTIONS";
   isDragging6 = false;
 }

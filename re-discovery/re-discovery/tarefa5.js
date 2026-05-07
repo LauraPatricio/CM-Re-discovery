@@ -188,7 +188,7 @@ function resetGame5() {
     t.setVolume(0);
     t.loop();
   }
-  tarefa5State = 'PLAY';
+  tarefa5State = 'INSTRUCTIONS';
 }
 
 class SyncRing {

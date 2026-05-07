@@ -11,6 +11,10 @@ const RING_X = 280;
 const RING_Y = 450 / 2; 
 const RING_RADIUS = 120;
 
+function preloadTarefa7() {
+  bgImg7 = loadImage('imagens/tarefa4.png');
+}
+
 function setupTarefa7() {
   syllables = [
     { text: "VE", x: RING_X, y: RING_Y - 90, hit: false },
@@ -219,19 +223,20 @@ function mouseReleasedTarefa7() {
     }
 
     if (isCorrect) {
-      currentWord = "disquoveri";
-      discoveryVisible = true;
-      
-      // --- VITÓRIA E DESBLOQUEIO ---
-      TarefaConcluida.veridis = true; // Avisa a nave que a Stella fez a Veridis Quo
-      
-      setTimeout(() => {
-          goTo("NAVE");
-          resetAttempt(); // Limpa as variáveis para se o jogador quiser repetir
-          discoveryVisible = false;
-      }, 1500);
+            currentWord = "disquoveri";
+            discoveryVisible = true;
+            
+            // --- VITÓRIA E DESBLOQUEIO ---
+            TarefaConcluida.veridis = true; 
+            
+            setTimeout(() => {
+                goTo("NAVE");
+                resetAttempt(); 
+                discoveryVisible = false;
+                tarefa7State = "INSTRUCTIONS"; // <--- ADICIONAR ESTA LINHA AQUI!
+            }, 1500);
 
-    } else {
+        } else {
       currentWord = ""; 
       flashError = true;
       errorTimer = 70; 

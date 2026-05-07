@@ -94,17 +94,16 @@ function drawTarefa1() {
 
     // ── LÓGICA DE ESTADOS (MUDANÇA AQUI) ──
     if (tarefa1State === "INSTRUCTIONS") {
-        // Mostra o ecrã de instruções uniformizado
-        // Usamos push/pop para garantir que o texto escala corretamente para o pop-up
         push();
         translate(popX, popY);
-        scale(popW / 800, popH / 500); 
+        // CORREÇÃO: Usar as variáveis globais do pop-up para tapar os buracos!
+        scale(popW / WIDE_WIDTH, popH / WIDE_HEIGHT); 
         drawTaskInstructions(
             "Aerodynamic", 
             "MEMORIZE THE PATTERN. Watch the sequence of lights and sounds carefully, then repeat it perfectly."
         );
         pop();
-    } 
+    }
     else {
         // --- TUDO O QUE ESTÁ AQUI DENTRO SÓ ACONTECE DEPOIS DO START ---
 
@@ -219,8 +218,8 @@ function handlePlayerInput(idx) {
         TarefaConcluida.aerodynamic = true;
         setTimeout(() => {
             goTo("NAVE");
-            gameStatus = "";     // Faz reset para a próxima
-            gameStarted = false; // Faz reset para a próxima
+            gameStatus = "";     
+            tarefa1State = "INSTRUCTIONS"; // ADICIONAR ESTA LINHA PARA RESETAR
         }, 1500);
     }
 

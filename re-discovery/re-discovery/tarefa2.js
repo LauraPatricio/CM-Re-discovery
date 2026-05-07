@@ -219,14 +219,12 @@ function checkInput(clickedWord) {
             TarefaConcluida.harder = true;
 
             setTimeout(() => {
-                goTo("NAVE"); // Transição direta de volta à nave!
-
-                // Reset automático para a próxima vez que jogar
+                goTo("NAVE"); 
                 generateRandomSequence(4);
                 playerSequence2 = [];
                 sequenceIndex = 0;
                 displayWord = "";
-                tarefa2State = 'MEMORIZE';
+                tarefa2State = "INSTRUCTIONS"; // MUDAR DE 'MEMORIZE' PARA 'INSTRUCTIONS'
             }, 1500);
 
         } else {

@@ -39,6 +39,7 @@ function preload() {
     preloadTarefa4();
     preloadTarefa5();
     preloadTarefa6();
+    preloadTarefa7();
     preloadTarefa8();
 }
 
@@ -293,13 +294,7 @@ function drawButton(btn) {
 function goTo(novoEstado, tipo = "NONE") {
     nextState = novoEstado;
     transitionType = tipo;
-
-    // --- NEW LOGIC FOR TAREFA 3 START ---
-    if (novoEstado === "TAREFA3") {
-        if (som3 && som3.isLoaded()) {
-            som3.loop();
-        }
-    }
+    
 
     if (novoEstado === "LIVRO") {
         if (somAmbienteNave && somAmbienteNave.isLoaded() && !somAmbienteNave.isPlaying()) {

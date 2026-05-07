@@ -168,7 +168,7 @@ function resetGame4() {
   score4 = 0;
   lives4 = 3;
   circles4 = [];
-  tarefa4State = 'PLAY';
+  tarefa4State = 'INSTRUCTIONS';
   // Garante que a música para e faz reset[cite: 16]
   if (som4 && som4.isLoaded()) {
     som4.stop();

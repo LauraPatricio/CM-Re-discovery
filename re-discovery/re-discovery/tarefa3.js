@@ -162,7 +162,7 @@ function resetGame3() {
     obstacles3 = [];
     score3 = 0;
     nextHeyIndex = 0;
-    tarefa3State = 'PLAY';
+    tarefa3State = 'INSTRUCTIONS';
     player3 = new Player3();
     
     // STOP the music to reset it, but do NOT call play() here.
