@@ -17,6 +17,7 @@ let btnNave = {
 let buttonLine = {};
 let buttonHover = {};
 let buttonConc = {};
+let imgVidros = {};
 
 // Lista única com os nomes base dos ficheiros
 let svgNames = ["Aerodynamic", "Crescendolls", "Some", "Super", "Veridis", "Voyager", "Harder", "One"];
@@ -26,6 +27,10 @@ function preloadNave() {
         buttonLine[nome] = loadImage('imagens/btn' + nome + 'Line.svg');
         buttonHover[nome] = loadImage('imagens/btn' + nome + 'Hover.svg');
         buttonConc[nome] = loadImage('imagens/btn' + nome + 'Conc.svg');
+    }
+
+   for (let i = 1; i <= 3; i++) {
+        imgVidros[i] = loadImage('imagens/vidro' + i + '.png');
     }
 }
 
@@ -39,6 +44,23 @@ function drawNave() {
     
     imageMode(CORNER);
     image(bgNave, 0, 0);
+
+    // ─── NOVO: LÓGICA DO VIDRO RACHADO COM BLENDMODE ──────────────
+    let nivelVidro = 0;
+
+    // Reaproveitamos a lógica do disco: 
+    // Cada vez que um personagem novo é desbloqueado, a racha avança!
+    if (personagensStatus.arpegius) nivelVidro = 1; // Baryl terminou
+    if (personagensStatus.octave) nivelVidro = 2;   // Arpegius terminou (Tarefas 1 e 2 completas)
+    if (personagensStatus.stella) nivelVidro = 3;   // Octave terminou
+    // Desenha a racha sobre o ecrã
+    // Adicionamos a condição "&& imgVidros[nivelVidro]" para que o jogo não dê erro
+    // enquanto não tiveres o vidro3 e vidro4 desenhados!
+    if (nivelVidro > 0 && imgVidros[nivelVidro]) {
+        blendMode(SCREEN); // Faz o preto ficar invisível e o branco brilhar
+        image(imgVidros[nivelVidro], 0, 0, bgNave.width, bgNave.height);
+        blendMode(BLEND);  // IMPORTANTE: Voltar ao modo normal para não estragar os botões!
+    }
 
     // --- DESENHAR OS BOTÕES ---
     drawBtnImagem(699, 805, btnNave.btnVoyager, TarefaConcluida.voyager, buttonLine["Voyager"], buttonHover["Voyager"], buttonConc["Voyager"]);
