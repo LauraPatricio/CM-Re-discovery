@@ -8,7 +8,7 @@ let som4; // Variável para a música
 
 function preloadTarefa4() {
   bgImg4 = loadImage('imagens/tarefa4.png');
-  som4 = loadSound('sons/superheroes.mp3'); // Carrega a música da tarefa[cite: 15]
+  som4 = loadSound('sons/superheroes.mp3'); 
 }
 
 function setupTarefa4() {}
@@ -68,13 +68,15 @@ function drawTarefa4() {
         }
       }
 
+      // --- CONDIÇÃO DE VITÓRIA RESOLVIDA ---
       if (score4 >= GOAL4) {
         tarefa4State = 'WIN';
         if (som4.isPlaying()) som4.stop(); // Para a música na vitória
         TarefaConcluida.super = true; 
+        
         setTimeout(() => {
-            goTo("NAVE");
-            resetGame4(); 
+            resetGame4(); // Faz reset para as instruções
+            concluirComMemoria("super"); // Chama o vídeo em vez da nave!
         }, 1500);
       }
       
@@ -124,14 +126,12 @@ function showWinScreenUniform() {
     textSize(popW * 0.08); // Tamanho consistente com a Tarefa 1
     text("IDENTITY RECOVERED", WIDE_WIDTH / 2, WIDE_HEIGHT / 2);
     
-    noAlpha(); // Reset shadow
+    drawingContext.shadowBlur = 0; // Reset shadow
     textSize(popW * 0.03);
     fill(255);
     text("MEMORY SYNCED...", WIDE_WIDTH / 2, WIDE_HEIGHT / 2 + 60);
     pop();
 }
-
-
 
 function mousePressedTarefa4() {
   // 1. Verificamos se estamos no ecrã de instruções
@@ -169,7 +169,7 @@ function resetGame4() {
   lives4 = 3;
   circles4 = [];
   tarefa4State = 'INSTRUCTIONS';
-  // Garante que a música para e faz reset[cite: 16]
+  // Garante que a música para e faz reset
   if (som4 && som4.isLoaded()) {
     som4.stop();
   }

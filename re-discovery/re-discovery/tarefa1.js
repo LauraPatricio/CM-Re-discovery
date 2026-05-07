@@ -198,7 +198,6 @@ function mousePressedTarefa1() {
         }
     }
 }
-
 function handlePlayerInput(idx) {
     interactiveButtons[idx].active = true;
     notes[idx].play();
@@ -216,10 +215,15 @@ function handlePlayerInput(idx) {
 
         // --- VITÓRIA E DESBLOQUEIO ---
         TarefaConcluida.aerodynamic = true;
+        
         setTimeout(() => {
-            goTo("NAVE");
+            // --- CONFLITO RESOLVIDO AQUI ---
+            // 1. Faz o reset da colega para as instruções aparecerem da próxima vez
+            tarefa1State = "INSTRUCTIONS"; 
             gameStatus = "";     
-            tarefa1State = "INSTRUCTIONS"; // ADICIONAR ESTA LINHA PARA RESETAR
+            
+            // 2. Chama a tua memória (que depois manda para a nave)
+            concluirComMemoria("aerodynamic");
         }, 1500);
     }
 

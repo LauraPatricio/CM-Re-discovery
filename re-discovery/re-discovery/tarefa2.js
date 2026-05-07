@@ -215,16 +215,21 @@ function checkInput(clickedWord) {
         if (isCorrect) {
             tarefa2State = 'WIN';
 
-            // --- VITÓRIA E DESBLOQUEIO COM GOTO() ---
+            // --- VITÓRIA E DESBLOQUEIO ---
             TarefaConcluida.harder = true;
 
             setTimeout(() => {
-                goTo("NAVE"); 
+                // 1. Reset automático para a próxima vez que jogar
                 generateRandomSequence(4);
                 playerSequence2 = [];
                 sequenceIndex = 0;
                 displayWord = "";
-                tarefa2State = "INSTRUCTIONS"; // MUDAR DE 'MEMORIZE' PARA 'INSTRUCTIONS'
+                
+                // 2. Usar o reset da tua colega para as instruções
+                tarefa2State = "INSTRUCTIONS";
+                
+                // 3. Chamar a tua função de memória em vez de ir para a Nave
+                concluirComMemoria("harder"); 
             }, 1500);
 
         } else {

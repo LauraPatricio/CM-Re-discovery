@@ -222,21 +222,22 @@ function mouseReleasedTarefa7() {
       }
     }
 
-    if (isCorrect) {
-            currentWord = "disquoveri";
-            discoveryVisible = true;
-            
-            // --- VITÓRIA E DESBLOQUEIO ---
-            TarefaConcluida.veridis = true; 
-            
-            setTimeout(() => {
-                goTo("NAVE");
-                resetAttempt(); 
-                discoveryVisible = false;
-                tarefa7State = "INSTRUCTIONS"; // <--- ADICIONAR ESTA LINHA AQUI!
-            }, 1500);
+   if (isCorrect) {
+      currentWord = "disquoveri";
+      discoveryVisible = true;
+      
+      // --- VITÓRIA E DESBLOQUEIO ---
+      TarefaConcluida.veridis = true; 
+      
+      // --- CONFLITO RESOLVIDO AQUI ---
+      setTimeout(() => {
+          resetAttempt(); 
+          discoveryVisible = false;
+          tarefa7State = "INSTRUCTIONS"; // Reset da colega
+          concluirComMemoria("veridis"); // A tua chamada de vídeo
+      }, 1500);
 
-        } else {
+    } else {
       currentWord = ""; 
       flashError = true;
       errorTimer = 70; 

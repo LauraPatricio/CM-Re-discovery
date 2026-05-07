@@ -72,14 +72,14 @@ function handleQuartoClick() {
     }
 }
 
-// ─── ECRÃ DE VITÓRIA (QUARTO 2) ─────────────────────────
-function drawVitoriaScreen() {
-    // Desenha o quarto 2 limpo
-    imageMode(CORNER);
-    image(bgQuarto2Img, 0, 0, quartoNewW, quartoNewH);
-}
+// // ─── ECRÃ DE VITÓRIA (QUARTO 2) ─────────────────────────
+// function drawVitoriaScreen() {
+//     // Desenha o quarto 2 limpo
+//     imageMode(CORNER);
+//     image(bgQuarto2Img, 0, 0, quartoNewW, quartoNewH);
+// }
 
-function handleVitoriaClick() {
-    // Faz um refresh à página inteira para recomeçar o jogo do zero
-    location.reload();
-}
+// function handleVitoriaClick() {
+//     // Faz um refresh à página inteira para recomeçar o jogo do zero
+//     location.reload();
+// }

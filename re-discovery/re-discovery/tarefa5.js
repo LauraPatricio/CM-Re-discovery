@@ -74,16 +74,17 @@ function drawTarefa5() {
         }
       }
 
-      if (currentRing >= GOAL5) {
+   if (currentRing >= GOAL5) {
         // Inicia a contagem de 5 segundos com a música completa
         winDelayTimer++;
         if (winDelayTimer > 300) { // 300 frames aprox. 5 segundos a 60fps
           tarefa5State = 'WIN';
           TarefaConcluida.some = true;
+          
           setTimeout(() => {
             stopAllTracks();
-            goTo("NAVE");
-            resetGame5();
+            resetGame5(); // Limpa as variáveis e volta para as INSTRUCTIONS
+            concluirComMemoria("some"); // Chama a memória de vídeo em vez de ir para a Nave!
           }, 1500);
         }
       }
@@ -128,7 +129,7 @@ function showWinScreenUniform() {
     textSize(popW * 0.08); // Tamanho consistente com a Tarefa 1
     text("IDENTITY RECOVERED", WIDE_WIDTH / 2, WIDE_HEIGHT / 2);
     
-    noAlpha(); // Reset shadow
+    drawingContext.shadowBlur = 0; // Reset shadow
     textSize(popW * 0.03);
     fill(255);
     text("MEMORY SYNCED...", WIDE_WIDTH / 2, WIDE_HEIGHT / 2 + 60);
