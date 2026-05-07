@@ -194,14 +194,15 @@ function checkInput(clickedWord) {
             TarefaConcluida.harder = true;
 
             setTimeout(() => {
-                goTo("NAVE"); // Transição direta de volta à nave!
-
                 // Reset automático para a próxima vez que jogar
                 generateRandomSequence(4);
                 playerSequence2 = [];
                 sequenceIndex = 0;
                 displayWord = "";
                 tarefa2State = 'MEMORIZE';
+                
+                // --- CHAMA O VÍDEO EM VEZ DA NAVE ---
+                concluirComMemoria("harder"); 
             }, 1500);
 
         } else {

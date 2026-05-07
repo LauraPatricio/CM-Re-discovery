@@ -59,11 +59,11 @@ function drawTarefa4() {
 
     if (score4 >= GOAL4) {
       tarefa4State = 'WIN';
-      if (som4.isPlaying()) som4.stop(); // Para a música na vitória[cite: 16]
+      if (som4.isPlaying()) som4.stop(); 
       TarefaConcluida.super = true; 
       setTimeout(() => {
-          goTo("NAVE");
-          resetGame4(); 
+          resetGame4(); // Limpa primeiro
+          concluirComMemoria("super"); // Chama o vídeo
       }, 1500);
     }
     

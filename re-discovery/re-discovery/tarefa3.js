@@ -17,13 +17,13 @@ const GOAL3 = 10;
 function preloadTarefa3() {
     bgImg3 = loadImage('imagens/tarefa3.png');
     // Certifique-se de que o caminho e nome do arquivo de áudio estejam corretos
-    som3 = loadSound('sons/crescendolls.mp3'); 
+    som3 = loadSound('sons/crescendolls.mp3');
 }
 
 function setupTarefa3() {
     player3 = new Player3();
     nextHeyIndex = 0;
-   
+
 }
 
 function drawTarefa3() {
@@ -31,7 +31,7 @@ function drawTarefa3() {
     imageMode(CENTER);
     image(bgNave, width / 2, height / 2, naveNewW, naveNewH);
     pop();
-    
+
     noStroke();
     fill(0, 0, 0, 180);
     rect(0, 0, width, height);
@@ -44,12 +44,12 @@ function drawTarefa3() {
     image(bgImg3, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
 
     if (tarefa3State === 'PLAY') {
-    // Start music if it's not playing and we are in the PLAY state
-    if (som3 && som3.isLoaded() && !som3.isPlaying()) {
-        som3.loop();
-    }
-    
-    player3.update();
+        // Start music if it's not playing and we are in the PLAY state
+        if (som3 && som3.isLoaded() && !som3.isPlaying()) {
+            som3.loop();
+        }
+
+        player3.update();
         player3.show();
         displayScore3();
 
@@ -73,8 +73,8 @@ function drawTarefa3() {
                     if (som3.isPlaying()) som3.stop(); // STOP IMMEDIATELY
                     TarefaConcluida.crescendolls = true;
                     setTimeout(() => {
-                        goTo("NAVE");
-                        resetGame3();
+                        resetGame3(); // Limpa primeiro
+                        concluirComMemoria("crescendolls"); // Chama o vídeo
                     }, 1500);
                 }
             }
@@ -152,7 +152,7 @@ function resetGame3() {
     nextHeyIndex = 0;
     tarefa3State = 'PLAY';
     player3 = new Player3();
-    
+
     // STOP the music to reset it, but do NOT call play() here.
     // This prevents the music from starting when you are trying to close the task.
     if (som3 && som3.isLoaded()) {

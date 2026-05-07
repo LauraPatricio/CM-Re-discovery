@@ -194,12 +194,12 @@ function mouseReleasedTarefa7() {
       discoveryVisible = true;
       
       // --- VITÓRIA E DESBLOQUEIO ---
-      TarefaConcluida.veridis = true; // Avisa a nave que a Stella fez a Veridis Quo
+      TarefaConcluida.veridis = true; 
       
       setTimeout(() => {
-          goTo("NAVE");
-          resetAttempt(); // Limpa as variáveis para se o jogador quiser repetir
+          resetAttempt(); // Limpa as variáveis
           discoveryVisible = false;
+          concluirComMemoria("veridis"); // Chama o vídeo
       }, 1500);
 
     } else {

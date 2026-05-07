@@ -181,7 +181,6 @@ function mousePressedTarefa1() {
         }
     }
 }
-
 function handlePlayerInput(idx) {
     interactiveButtons[idx].active = true;
     notes[idx].play();
@@ -199,10 +198,14 @@ function handlePlayerInput(idx) {
 
         // --- VITÓRIA E DESBLOQUEIO ---
         TarefaConcluida.aerodynamic = true;
+        
         setTimeout(() => {
-            goTo("NAVE");
-            gameStatus = "";     // Faz reset para a próxima
-            gameStarted = false; // Faz reset para a próxima
+            // Faz reset para a próxima vez
+            gameStatus = "";     
+            gameStarted = false; 
+            
+            // --- NOVA LINHA: Chama a memória de Aerodynamic ---
+            concluirComMemoria("aerodynamic");
         }, 1500);
     }
 

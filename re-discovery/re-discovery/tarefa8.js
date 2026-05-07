@@ -167,16 +167,16 @@ function handleVinylPhase() {
   fill(0, 255, 100);
   rect(WIDE_WIDTH/2 - barWidth/2, 400, constrain(progress, 0, barWidth), 8, 4);
 
-  if (totalRotation >= TWO_PI * targetRotations && tarefa8phase === 2) {
+ if (totalRotation >= TWO_PI * targetRotations && tarefa8phase === 2) {
     tarefa8phase = 3;
     
     // --- VITÓRIA E DESBLOQUEIO ---
-    TarefaConcluida.one = true; // Avisa a nave que a Tarefa One More Time foi feita
+    TarefaConcluida.one = true; 
     
     setTimeout(() => {
-        goTo("NAVE"); 
-        resetTarefa8();
-    }, 2000); // 2 segundos para o jogador ler o "Discovery Complete"
+        resetTarefa8(); // Limpa primeiro
+        concluirComMemoria("one"); // Chama o vídeo
+    }, 2000); 
   }
 }
 
