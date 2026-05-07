@@ -4,42 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Re-Discovery: Aerodynamic Challenge</title>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
-    
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #050505; /* Dark background to match the space theme */
-            overflow: hidden;
-        }
-        canvas {
-            border: 2px solid #333;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-        }
+        body { margin:0; padding:0; display:flex; justify-content:center; align-items:center; height:100vh; background:#050505; overflow:hidden; }
+        canvas { border:2px solid #333; box-shadow:0 0 20px rgba(0,255,255,0.2); }
     </style>
 </head>
 <body>
-
-<script src="quarto.js"></script>
-<script src="menu.js"></script>
-<script src="livro.js"></script>
-<script src="menu_personagens.js"></script>
-<script src="nave.js"></script>
-<script src="tarefa1.js"></script>
-<script src="tarefa2.js"></script>
-<script src="tarefa3.js"></script>
-<script src="tarefa4.js"></script>
-<script src="tarefa5.js"></script>
-<script src="tarefa6.js"></script>
-<script src="tarefa7.js"></script>
-<script src="tarefa8.js"></script>
-<script src="quarto_.js"></script>
+    <!--
+        REGRA DE OURO: menu.js SEMPRE O ÚLTIMO.
+        Ele define goTo(), WIDE_WIDTH, widePopX, setup(), draw(), etc.
+        Todos os outros ficheiros dependem dessas definições em runtime — OK.
+        Mas se menu.js carregar antes de nave.js, ele tenta chamar preloadNave()
+        que ainda não existe → crash.
+    -->
+    <script src="nave.js"></script>
+    <script src="quarto.js"></script>
+    <script src="livro.js"></script>
+    <script src="menu_personagens.js"></script>
+    <script src="tarefa1.js"></script>
+    <script src="tarefa2.js"></script>
+    <script src="tarefa3.js"></script>
+    <script src="tarefa4.js"></script>
+    <script src="tarefa5.js"></script>
+    <script src="tarefa6.js"></script>
+    <script src="tarefa7.js"></script>
+    <script src="tarefa8.js"></script>
+    <script src="memoria.js"></script>
+    <script src="menu.js"></script>  <!-- SEMPRE O ÚLTIMO -->
 </body>
 </html>

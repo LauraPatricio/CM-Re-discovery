@@ -72,8 +72,8 @@ function drawTarefa5() {
         TarefaConcluida.some = true;
         setTimeout(() => {
           stopAllTracks();
-          goTo("NAVE");
           resetGame5();
+          concluirComMemoria("some"); // ← toca a memória antes de voltar à nave
         }, 1500);
       }
     }
@@ -117,7 +117,7 @@ function showWinScreenUniform() {
     textSize(popW * 0.08); // Tamanho consistente com a Tarefa 1
     text("IDENTITY RECOVERED", WIDE_WIDTH / 2, WIDE_HEIGHT / 2);
     
-    noAlpha(); // Reset shadow
+    drawingContext.shadowBlur = 0; // Reset shadow
     textSize(popW * 0.03);
     fill(255);
     text("MEMORY SYNCED...", WIDE_WIDTH / 2, WIDE_HEIGHT / 2 + 60);

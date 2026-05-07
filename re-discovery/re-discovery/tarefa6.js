@@ -136,11 +136,14 @@ function updateGame6() {
       tarefa6State = "WIN";
       isDragging6 = false;
       TarefaConcluida.voyager = true; 
+      
+      // --- A MUDANÇA ESTÁ AQUI ---
       setTimeout(() => {
-          goTo("NAVE");
-          resetGame6();
+          resetGame6(); // Limpa a tarefa para a próxima vez
+          concluirComMemoria("voyager"); // Chama o vídeo da memória correspondente!
       }, 1500);
     }
+    
     drawRocket6(virtualMouseX, virtualMouseY);
   }
 }

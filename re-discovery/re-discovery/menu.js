@@ -222,11 +222,14 @@ function draw() {
         drawTarefa8();
     } else if (gameState === "VITORIA") { 
         drawVitoriaScreen();
+    } else if (gameState === "MEMORIA") {
+        drawMemoriaScreen();
     }
 
     if (gameState.startsWith("TAREFA")) {
         drawUniversalExit();
     }
+    // Nota: MEMORIA não tem botão de exit — o clique já serve de skip/continuar
 
     handleTransition();
 }
@@ -396,6 +399,8 @@ function mousePressed() {
         mousePressedTarefa8();
     } else if (gameState === "VITORIA") { 
         handleVitoriaClick();
+    } else if (gameState === "MEMORIA") {
+        handleMemoriaClick();
     }
 }
 
