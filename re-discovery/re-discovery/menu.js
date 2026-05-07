@@ -207,6 +207,8 @@ function draw() {
 
     if (gameState === "MENU") {
         drawMenu();
+    } else if (gameState === "ABOUT") { // <--- ADICIONA ESTA LINHA AQUI
+        drawAboutScreen();
     } else if (gameState === "QUARTO") {
         drawQuartoScreen(); 
     } else if (gameState === "LIVRO") {
@@ -383,15 +385,33 @@ function mousePressed() {
     }
     
     if (gameState === "MENU") {
+        // --- Clique no Botão START ---
         if (
             mouseX > startBtn.x - startBtn.w / 2 && mouseX < startBtn.x + startBtn.w / 2 &&
             mouseY > startBtn.y - startBtn.h / 2 && mouseY < startBtn.y + startBtn.h / 2
         ) {
             let fs = fullscreen();
             fullscreen(!fs);
-            
-            // --- ATUALIZADO: Agora usamos a função goTo para o Fade ---
             goTo("QUARTO", "FADE"); 
+        }
+        
+        // --- Clique no Botão ABOUT ---
+        if (
+            mouseX > aboutBtn.x - aboutBtn.w / 2 && mouseX < aboutBtn.x + aboutBtn.w / 2 &&
+            mouseY > aboutBtn.y - aboutBtn.h / 2 && mouseY < aboutBtn.y + aboutBtn.h / 2
+        ) {
+            goTo("ABOUT", "FADE"); // Usa o efeito Fade para entrar no About
+        }
+    }
+    // --- LÓGICA DE CLIQUE NO ECRÃ ABOUT ---
+    else if (gameState === "ABOUT") {
+        let ex = width * 0.05; 
+        let ey = height * 0.08; 
+        let size = width * 0.025;
+        
+        // Se clicar na cruzinha, volta ao menu
+        if (dist(mouseX, mouseY, ex, ey) < size / 2) {
+            goTo("MENU", "FADE"); 
         }
     }
     else if (gameState === "QUARTO") {
@@ -521,4 +541,62 @@ function checkStartClick() {
     let btnY = 325;
     
     return (vmX > btnX - 75 && vmX < btnX + 75 && vmY > btnY - 25 && vmY < btnY + 25);
+}
+
+
+// ── Ecrã About ──────────────────────────────────────
+function drawAboutScreen() {
+    // Desenha o fundo do menu
+    image(bgMenu, 0, 0, menuNewW, menuNewH);
+    
+    // Película escura
+    noStroke();
+    fill(0, 0, 0, 220);
+    rect(0, 0, width, height);
+
+    push();
+    textAlign(CENTER, CENTER);
+    textFont('Impact');
+
+    // Título Néon Ciano
+    drawingContext.shadowBlur = 15;
+    drawingContext.shadowColor = color(0, 255, 255);
+    fill(0, 255, 255);
+    textSize(width * 0.04);
+    text("ABOUT THE PROJECT", width / 2, height * 0.25);
+
+    // Corpo de Texto
+    drawingContext.shadowBlur = 0;
+    fill(255);
+    textSize(max(18, width * 0.015)); // Tamanho responsivo, mas nunca menor que 18
+    textAlign(CENTER, TOP); // Alinha pelo topo para o wrap funcionar bem
+
+    let aboutText = "Re-Discovery is an interactive web experience that explores the intersection of music, narrative, and digital art, inspired by Daft Punk’s Discovery and the film Interstella 5555. The project’s core concept revolves around the tension between corporate control and individual identity, symbolized by the mind-control glasses that frame the player's view. As the player progresses through rhythmic challenges to recover lost fragments of memory, this visual barrier progressively cracks, representing the process of breaking a forced trance and reclaiming a stolen past. This work was created by Laura Patrício and Myrella Andrade for the Multimedia Communication (Comunicação Multimédia) course in the Design and Multimedia degree at the University of Coimbra.";
+
+    // Caixa delimitadora de texto (Wrap) para manter as margens curtas e centradas
+    let textW = width * 0.55; 
+    text(aboutText, width / 2 - textW / 2, height * 0.35, textW, height * 0.5);
+    pop();
+
+    // Desenha o botão de voltar atrás
+    drawAboutExitBtn();
+}
+
+function drawAboutExitBtn() {
+    // Posição no canto superior esquerdo
+    let ex = width * 0.05; 
+    let ey = height * 0.08; 
+    let size = width * 0.025; // O mesmo tamanho do teu exit universal
+
+    push();
+    imageMode(CENTER);
+
+    // Efeito Hover
+    if (dist(mouseX, mouseY, ex, ey) < size / 2) {
+        cursor(HAND);
+        tint(255, 150, 150); // Fica avermelhado
+    }
+
+    image(exitImg, ex, ey, size, size);
+    pop();
 }
