@@ -2,7 +2,7 @@ let bgImg8, vinylCenterImg;
 let somDrums, somOneMore; // Faixas sincronizadas
 let somStatic;           // Ruído do vinil
 let winDelayTimer8 = 0;   // Timer de 5 segundos
-let tarefa8phase = 1; 
+let tarefa8State = "INSTRUCTIONS";
 let sliderY = 270; // (Era 300) Ajustado para a proporção 800x450
 let sliderSpeed = 4;
 let sliderDirection = 1;
@@ -64,45 +64,47 @@ function drawTarefa8() {
   imageMode(CORNER);
   image(bgImg8, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
 
-  drawVinylLabel();
-
-  if (tarefa8phase === 1) {
-    handleSliderPhase();
+  // ── LÓGICA DE ESTADOS (INSTRUÇÕES VS JOGO) ──
+  if (tarefa8State === "INSTRUCTIONS") {
+    drawTaskInstructions(
+        "One More Time", 
+        "RECOVER THE IDENTITY. First, stop the moving slider inside the green zone. Then, click and drag the vinyl record in circles to bring the music back to life."
+    );
   } 
-  else if (tarefa8phase === 2) {
-    handleVinylPhase();
-    
-    // ATIVAÇÃO DA BATERIA: Volume sobe para 1.0 assim que entra na Fase 2
-    if (somDrums.isLoaded()) somDrums.setVolume(1.0);
+  else {
+    // --- TUDO O QUE ESTÁ AQUI DENTRO SÓ ACONTECE DEPOIS DO START ---
+    drawVinylLabel();
 
-    // --- CONTROLO DINÂMICO DE ÁUDIO ---
-    if (isSpinning) {
-      let progressFactor = totalRotation / (TWO_PI * targetRotations);
+    if (tarefa8phase === 1) {
+      handleSliderPhase();
+    } 
+    else if (tarefa8phase === 2) {
+      handleVinylPhase();
       
-      // A estática diminui conforme o progresso (de 0.5 para 0)[cite: 20]
-      somStatic.setVolume(map(progressFactor, 0, 1, 0.5, 0));
-      
-      // A melodia ("One More Time") aumenta conforme o progresso[cite: 20]
-      somOneMore.setVolume(map(progressFactor, 0, 1, 0, 1.0));
-    } else {
-      // Se não estiver a girar, a estática e a melodia ficam em silêncio[cite: 20]
+      if (somDrums.isLoaded()) somDrums.setVolume(1.0);
+
+      if (isSpinning) {
+        let progressFactor = totalRotation / (TWO_PI * targetRotations);
+        somStatic.setVolume(map(progressFactor, 0, 1, 0.5, 0));
+        somOneMore.setVolume(map(progressFactor, 0, 1, 0, 1.0));
+      } else {
+        somStatic.setVolume(0);
+        somOneMore.setVolume(0);
+      }
+    } 
+    else if (tarefa8phase === 3) {
       somStatic.setVolume(0);
-      somOneMore.setVolume(0);
-    }
-  } 
-  else if (tarefa8phase === 3) {
-    // Vitória: Para a estática e mantém a música completa por 5 segundos[cite: 17]
-    somStatic.setVolume(0);
-    somDrums.setVolume(1.0);
-    somOneMore.setVolume(1.0);
+      somDrums.setVolume(1.0);
+      somOneMore.setVolume(1.0);
 
-    winDelayTimer8++;
-    if (winDelayTimer8 > 300) { // ~5 segundos a 60fps
-       showFinalWin();
+      winDelayTimer8++;
+      if (winDelayTimer8 > 300) { 
+         showFinalWin();
+      }
     }
   }
   
-  pop(); // Fim da escala
+  pop(); 
 }
 
 function drawVinylLabel() {
@@ -181,11 +183,23 @@ function handleVinylPhase() {
 }
 
 function mousePressedTarefa8() {
+  // 1. Verificar clique no botão de instruções
+  if (tarefa8State === "INSTRUCTIONS") {
+    if (checkStartClick()) {
+      tarefa8State = "PLAY"; // Ativa o bloco 'else' no draw
+      tarefa8phase = 1;      // Inicia efetivamente o jogo na Fase 1
+    }
+    return;
+  }
+
+  // 2. Lógica original de interação (Slider e Vinil)
   if (tarefa8phase === 1) {
     if (sliderY > greenZoneY && sliderY < greenZoneY + greenZoneH) {
       tarefa8phase = 2;
     }
   }
+  // A lógica de arrastar o vinil é gerida dentro do handleVinylPhase() 
+  // que utiliza mouseIsPressed, por isso não precisa de código extra aqui.
 }
 
 function showFinalWin() {
@@ -214,6 +228,7 @@ function showFinalWin() {
 }
 
 function resetTarefa8() {
+    tarefa8State = "INSTRUCTIONS"; // ADICIONAR ESTA LINHA AQUI!
     tarefa8phase = 1;
     sliderY = 270;
     rotationAngle = 0;

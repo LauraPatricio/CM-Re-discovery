@@ -1,7 +1,7 @@
 let bgImg6;
 let rocketImg6;
 let isDragging6 = false;
-let tarefa6State = "START"; 
+let tarefa6State = "INSTRUCTIONS";
 let pathPoints6 = [];
 const tolerance6 = 25; 
 
@@ -42,21 +42,29 @@ function drawTarefa6() {
   imageMode(CORNER);
   image(bgImg6, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
 
-  if (tarefa6State === "START") {
-    drawOverlay6("VOYAGER", "HOLD MOUSE TO GUIDE ROCKET");
-    drawRocket6(pathPoints6[0].x, pathPoints6[0].y);
+  // ── LÓGICA DE ESTADOS (INSTRUÇÕES VS JOGO) ──
+  if (tarefa6State === "INSTRUCTIONS") {
+    drawTaskInstructions(
+        "Voyager", 
+        "GUIDE THE VOYAGER. Click and hold the rocket to guide it through the cosmic path. Do not stray from the path or the connection will be lost."
+    );
   } 
-  else if (tarefa6State === "PLAYING") {
-    updateGame6();
-  } 
-  else if (tarefa6State === "FAIL") {
-    // This calls the overlay with the uniform failure style parameters
-    drawOverlay6("FAILED", "STRAYED FROM PATH - TRY AGAIN");
-    drawRocket6(pathPoints6[0].x, pathPoints6[0].y);
-}
-  else if (tarefa6State === "WIN") {
-    // Integration: Calling the new uniform win screen function
-    showWinScreenUniform();
+  else {
+    // --- LÓGICA ORIGINAL DO JOGO ---
+    if (tarefa6State === "START") {
+      drawOverlay6("VOYAGER", "HOLD MOUSE TO GUIDE ROCKET");
+      drawRocket6(pathPoints6[0].x, pathPoints6[0].y);
+    } 
+    else if (tarefa6State === "PLAYING") {
+      updateGame6();
+    } 
+    else if (tarefa6State === "FAIL") {
+      drawOverlay6("FAILED", "STRAYED FROM PATH - TRY AGAIN");
+      drawRocket6(pathPoints6[0].x, pathPoints6[0].y);
+    }
+    else if (tarefa6State === "WIN") {
+      showWinScreenUniform();
+    }
   }
 
   pop(); 
@@ -154,16 +162,24 @@ function drawRocket6(x, y) {
 }
 
 function mousePressedTarefa6() {
+  // 1. Verificar clique no botão de instruções
+  if (tarefa6State === "INSTRUCTIONS") {
+    if (checkStartClick()) {
+      tarefa6State = "START"; 
+    }
+    return; // Impede interações com o foguetão antes de começar
+  }
+
+  // 2. Lógica original de clique/arrasto (apenas se o jogo já começou)
   let virtualMouseX = (mouseX - widePopX) / (widePopW / WIDE_WIDTH);
   let virtualMouseY = (mouseY - widePopY) / (widePopH / WIDE_HEIGHT);
 
   if (tarefa6State === "START" || tarefa6State === "FAIL") {
-    if (dist(virtualMouseX, virtualMouseY, pathPoints6[0].x, pathPoints6[0].y) < 100) {
+    // Verifica se clicou perto do ponto inicial para começar a arrastar
+    if (dist(virtualMouseX, virtualMouseY, pathPoints6[0].x, pathPoints6[0].y) < 30) {
       tarefa6State = "PLAYING";
       isDragging6 = true;
     }
-  } else if (tarefa6State === "PLAYING") {
-    isDragging6 = true;
   }
 }
 
@@ -175,6 +191,6 @@ function mouseReleasedTarefa6() {
 }
 
 function resetGame6() {
-  tarefa6State = "START";
+  tarefa6State = "INSTRUCTIONS";
   isDragging6 = false;
 }
