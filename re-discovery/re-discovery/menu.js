@@ -41,6 +41,7 @@ function preload() {
     preloadTarefa6();
     preloadTarefa7();
     preloadTarefa8();
+    
 }
 
 // ── Setup ─────────────────────────────────────

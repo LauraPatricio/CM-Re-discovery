@@ -12,13 +12,6 @@
     </style>
 </head>
 <body>
-    <!--
-        REGRA DE OURO: menu.js SEMPRE O ÚLTIMO.
-        Ele define goTo(), WIDE_WIDTH, widePopX, setup(), draw(), etc.
-        Todos os outros ficheiros dependem dessas definições em runtime — OK.
-        Mas se menu.js carregar antes de nave.js, ele tenta chamar preloadNave()
-        que ainda não existe → crash.
-    -->
     <script src="nave.js"></script>
     <script src="quarto.js"></script>
     <script src="livro.js"></script>
@@ -32,6 +25,7 @@
     <script src="tarefa7.js"></script>
     <script src="tarefa8.js"></script>
     <script src="memoria.js"></script>
-    <script src="menu.js"></script>  <!-- SEMPRE O ÚLTIMO -->
+    <script src="vitoria.js"></script>
+    <script src="menu.js"></script> 
 </body>
 </html>

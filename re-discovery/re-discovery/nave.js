@@ -13,6 +13,9 @@ let btnNave = {
     btnVeridis: false, btnVoyager: false, btnHarder: false, btnOne: false
 };
 
+// Flag anti-loop: impede verificarProgressoNave() de disparar goTo() em cada frame
+let _missaoConcluida = false;
+
 // Dicionários para guardar as imagens carregadas
 let buttonLine = {};
 let buttonHover = {};
@@ -29,7 +32,7 @@ function preloadNave() {
         buttonConc[nome] = loadImage('imagens/btn' + nome + 'Conc.svg');
     }
 
-   for (let i = 1; i <= 3; i++) {
+   for (let i = 1; i <= 4; i++) {
         imgVidros[i] = loadImage('imagens/vidro' + i + '.png');
     }
 }
@@ -116,6 +119,7 @@ function drawBtnImagem(x, y, isUnlocked, isConcluded, imgLine, imgHover, imgConc
 // Configura quais botões aparecem dependendo do personagem
 function configurarBotoesNave() {
     for (let key in btnNave) { btnNave[key] = false; }
+    _missaoConcluida = false; // reset ao entrar com novo personagem
 
     if (personagemAtual === "BARYL") {
         btnNave.btnVoyager = true;
@@ -134,24 +138,36 @@ function configurarBotoesNave() {
 
 // Verifica se o personagem terminou as suas duas tarefas
 function verificarProgressoNave() {
+    if (_missaoConcluida) return; // impede loop infinito frame-a-frame
+
+    let concluiu = false;
+    let destino  = "MENU_PERSONAGENS";
+
     if (personagemAtual === "BARYL" && TarefaConcluida.voyager && TarefaConcluida.crescendolls) {
         personagensStatus.arpegius = true;
-        goTo("MENU_PERSONAGENS");
-        personagemAtual = "";
+        concluiu = true;
     }
     else if (personagemAtual === "ARPEGIUS" && TarefaConcluida.aerodynamic && TarefaConcluida.harder) {
         personagensStatus.octave = true;
-        goTo("MENU_PERSONAGENS");
-        personagemAtual = "";
+        concluiu = true;
     }
     else if (personagemAtual === "OCTAVE" && TarefaConcluida.super && TarefaConcluida.veridis) {
         personagensStatus.stella = true;
-        goTo("MENU_PERSONAGENS");
-        personagemAtual = "";
+        concluiu = true;
     }
     else if (personagemAtual === "STELLA" && TarefaConcluida.some && TarefaConcluida.one) {
-        personagensStatus.stella = true;
-        goTo("MENU_PERSONAGENS");
+        destino  = "VITORIA";
+        concluiu = true;
+    }
+
+    if (concluiu) {
+        _missaoConcluida = true;
+        personagemAtual  = "";
+        if (destino === "VITORIA") {
+            iniciarCenaFinal(); // inicia a animação e faz goTo("VITORIA") internamente
+        } else {
+            goTo(destino);
+        }
     }
 }
 
