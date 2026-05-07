@@ -3,7 +3,7 @@ let notes = [];
 let sequence = [];
 let playerSequence = [];
 let isShowing = false;
-let gameStarted = false;
+let tarefa1State = "INSTRUCTIONS";
 let step = 0;
 let lastStepTime = 0;
 
@@ -74,12 +74,13 @@ function initializeGrids() {
 }
 
 function drawTarefa1() {
-    // ── EFEITO POP-UP ──
+    // ── EFEITO POP-UP (Fundo e Moldura) ──
     // 1. Desenha a nave no fundo
-   push();
+    push();
     imageMode(CENTER);
-    image(bgNave, width/2, height/2,naveNewW, naveNewH );
+    image(bgNave, width/2, height/2, naveNewW, naveNewH);
     pop();
+
     // 2. Película escura
     noStroke();
     fill(0, 0, 0, 180);
@@ -91,31 +92,45 @@ function drawTarefa1() {
     image(bgImg, popX, popY, popW, popH); // Imagem da tarefa
     pop();
 
-    if (!gameStarted) {
-        drawStartScreen();
-        return;
-    }
+    // ── LÓGICA DE ESTADOS (MUDANÇA AQUI) ──
+    if (tarefa1State === "INSTRUCTIONS") {
+        // Mostra o ecrã de instruções uniformizado
+        // Usamos push/pop para garantir que o texto escala corretamente para o pop-up
+        push();
+        translate(popX, popY);
+        scale(popW / 800, popH / 500); 
+        drawTaskInstructions(
+            "Aerodynamic", 
+            "MEMORIZE THE PATTERN. Watch the sequence of lights and sounds carefully, then repeat it perfectly."
+        );
+        pop();
+    } 
+    else {
+        // --- TUDO O QUE ESTÁ AQUI DENTRO SÓ ACONTECE DEPOIS DO START ---
 
-    // Lógica da sequência (mantém-se igual)
-    if (isShowing) {
-        if (millis() - lastStepTime > 600) {
-            for (let i = 0; i < 9; i++) visualSquares[i].active = false;
-
-            if (step < sequence.length) {
-                let currentIdx = sequence[step];
-                visualSquares[currentIdx].active = true;
-                notes[currentIdx].play();
-                step++;
-                lastStepTime = millis();
-            } else {
-                isShowing = false;
+        // Lógica da sequência
+        if (isShowing) {
+            if (millis() - lastStepTime > 600) {
+                // Desativa todos os brilhos antes de mostrar o próximo
                 for (let i = 0; i < 9; i++) visualSquares[i].active = false;
+
+                if (step < sequence.length) {
+                    let currentIdx = sequence[step];
+                    visualSquares[currentIdx].active = true;
+                    notes[currentIdx].play();
+                    step++;
+                    lastStepTime = millis();
+                } else {
+                    isShowing = false;
+                    for (let i = 0; i < 9; i++) visualSquares[i].active = false;
+                }
             }
         }
-    }
 
-    drawVisualFeedbacks();
-    drawResultMessage();
+        // Desenha os elementos ativos do jogo
+        drawVisualFeedbacks();
+        drawResultMessage();
+    }
 }
 
 function drawVisualFeedbacks() {
@@ -165,13 +180,16 @@ function drawStartScreen() {
 }
 
 function mousePressedTarefa1() {
-    if (!gameStarted) {
-        userStartAudio();
-        gameStarted = true;
-        startNewRound();
-        return;
+    // 1. Verificamos se estamos no ecrã de instruções
+    if (tarefa1State === "INSTRUCTIONS") {
+        if (checkStartClick()) {
+            tarefa1State = "PLAY"; 
+            startNewRound(); // Arranca a primeira sequência de luzes/sons!
+        }
+        return; // O 'return' impede que o código continue e clique nos botões sem querer
     }
 
+    // 2. A tua lógica antiga dos quadrados (só funciona depois do START)
     if (isShowing || gameStatus === "PASS") return;
 
     for (let i = 0; i < 9; i++) {

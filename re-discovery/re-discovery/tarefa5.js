@@ -2,7 +2,7 @@ let bgImg5;
 let rings = [];
 let tracks = []; // Array para as faixas de música
 let currentRing = 0;
-let tarefa5State = 'PLAY';
+let tarefa5State = "INSTRUCTIONS";
 const GOAL5 = 3;
 let winDelayTimer = 0; // Timer para o atraso de 5 segundos
 
@@ -50,35 +50,46 @@ function drawTarefa5() {
   imageMode(CORNER);
   image(bgImg5, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
 
-  if (tarefa5State === 'PLAY') {
-    displayHUD5();
-    drawDebugButtons5();
+  // ── LÓGICA DE ESTADOS (INSTRUÇÕES VS JOGO) ──
+  if (tarefa5State === "INSTRUCTIONS") {
+    // Mostra o ecrã de instruções uniformizado
+    drawTaskInstructions(
+        "Something About Us", 
+        "RESONATE THE FREQUENCY. Click the instrument buttons when the rotating square aligns perfectly with the target. Sync all three to complete the melody."
+    );
+  } 
+  else {
+    // --- TUDO O QUE ESTÁ AQUI DENTRO SÓ ACONTECE DEPOIS DE CLICAR NO START ---
+    if (tarefa5State === 'PLAY') {
+      displayHUD5();
+      drawDebugButtons5();
 
-    for (let i = 0; i < rings.length; i++) {
-      rings[i].update();
-      rings[i].show();
-      
-      // Se o anel estiver sincronizado, aumenta o volume daquela faixa
-      if (rings[i].isSynced) {
-        tracks[i].setVolume(1.0);
+      for (let i = 0; i < rings.length; i++) {
+        rings[i].update();
+        rings[i].show();
+        
+        // Se o anel estiver sincronizado, aumenta o volume daquela faixa
+        if (rings[i].isSynced) {
+          tracks[i].setVolume(1.0);
+        }
       }
-    }
 
-    if (currentRing >= GOAL5) {
-      // Inicia a contagem de 5 segundos com a música completa
-      winDelayTimer++;
-      if (winDelayTimer > 300) { // 300 frames aprox. 5 segundos a 60fps
-        tarefa5State = 'WIN';
-        TarefaConcluida.some = true;
-        setTimeout(() => {
-          stopAllTracks();
-          goTo("NAVE");
-          resetGame5();
-        }, 1500);
+      if (currentRing >= GOAL5) {
+        // Inicia a contagem de 5 segundos com a música completa
+        winDelayTimer++;
+        if (winDelayTimer > 300) { // 300 frames aprox. 5 segundos a 60fps
+          tarefa5State = 'WIN';
+          TarefaConcluida.some = true;
+          setTimeout(() => {
+            stopAllTracks();
+            goTo("NAVE");
+            resetGame5();
+          }, 1500);
+        }
       }
+    } else if (tarefa5State === 'WIN') {
+      showWinScreenUniform();
     }
-  } else if (tarefa5State === 'WIN') {
-    showWinScreenUniform();
   }
   pop();
 }
@@ -125,17 +136,29 @@ function showWinScreenUniform() {
 }
 
 function mousePressedTarefa5() {
+  // 1. Verificamos se estamos no ecrã de instruções
+  if (tarefa5State === "INSTRUCTIONS") {
+    if (checkStartClick()) {
+      tarefa5State = "PLAY"; 
+      // As músicas já estão a tocar em "mute" (volume 0) graças ao setupTarefa5(), 
+      // portanto não é preciso iniciar as tracks aqui!
+    }
+    return; // Pára aqui para não clicar nos instrumentos acidentalmente
+  }
+
+  // 2. Lógica do jogo (Clicar nos botões para sincronizar os anéis)
   if (tarefa5State === 'PLAY') {
-    // --- MAGIA MATEMÁTICA: O clique virtual ---
     let virtualMouseX = (mouseX - widePopX) / (widePopW / WIDE_WIDTH);
     let virtualMouseY = (mouseY - widePopY) / (widePopH / WIDE_HEIGHT);
 
-    if (virtualMouseX > bX5 && virtualMouseX < bX5 + bW5 &&
-      virtualMouseY > bY_positions5[currentRing] && virtualMouseY < bY_positions5[currentRing] + bH5) {
+    if (currentRing < GOAL5) {
+      if (virtualMouseX > bX5 && virtualMouseX < bX5 + bW5 &&
+          virtualMouseY > bY_positions5[currentRing] && virtualMouseY < bY_positions5[currentRing] + bH5) {
 
-      if (rings[currentRing].checkSync()) {
-        rings[currentRing].isSynced = true;
-        currentRing++;
+        if (rings[currentRing].checkSync()) {
+          rings[currentRing].isSynced = true;
+          currentRing++;
+        }
       }
     }
   }

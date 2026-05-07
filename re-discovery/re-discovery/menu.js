@@ -14,6 +14,8 @@ let transitionType = "NONE"; // Começa sem transição
 let noiseDuration = 30;      // Duração da estática (30 frames = aprox. meio segundo)
 let noiseCounter = 0;
 
+let somAmbienteNave;
+
 // Proporção popup
 let widePopX, widePopY, widePopW, widePopH;
 const WIDE_WIDTH = 800;
@@ -25,6 +27,8 @@ function preload() {
     bgMenu = loadImage('imagens/fundo.png');
     exitImg = loadImage('imagens/Exit.png');
     logo = loadImage('imagens/logo.png');
+    somAmbienteNave = loadSound('sons/spaceship.mp3');
+
     preloadQuarto();
     preloadLivro();
     preloadMenuPerson();
@@ -120,34 +124,40 @@ function checkUniversalExit() {
 
 function resetCurrentTask() {
     if (gameState === "TAREFA1") {
+        tarefa1State = "INSTRUCTIONS"; // Reset do estado para o ecrã de texto
         gameStatus = "";
         gameStarted = false;
     } else if (gameState === "TAREFA2") {
-        tarefa2State = 'MEMORIZE';
+        tarefa2State = "INSTRUCTIONS"; // Reset do estado para o ecrã de texto
         loseTimer = 0;
-        playerSequence2 = []; // Corrigido para bater com o seu nome de variável
+        playerSequence2 = []; 
         sequenceIndex = 0;
         displayWord = "";
     } else if (gameState === "TAREFA3") { 
-        // 1. Stop the music
+        tarefa3State = "INSTRUCTIONS"; // Reset do estado para o ecrã de texto
         if (som3 && som3.isPlaying()) {
             som3.stop();
         }
-        // 2. Reset variables (now safe because resetGame3 no longer calls play())
         resetGame3(); 
-    }
-    else if (gameState === "TAREFA4") { resetGame4(); }
-    else if (gameState === "TAREFA5") { resetGame5(); }
-    else if (gameState === "TAREFA6") { resetGame6(); }
-    else if (gameState === "TAREFA7") {
+    } else if (gameState === "TAREFA4") {
+        tarefa4State = "INSTRUCTIONS"; // Reset do estado para o ecrã de texto
+        resetGame4(); 
+    } else if (gameState === "TAREFA5") {
+        tarefa5State = "INSTRUCTIONS"; // Reset do estado para o ecrã de texto
+        resetGame5(); 
+    } else if (gameState === "TAREFA6") {
+        tarefa6State = "INSTRUCTIONS"; // Reset do estado para o ecrã de texto
+        resetGame6(); 
+    } else if (gameState === "TAREFA7") {
+        tarefa7State = "INSTRUCTIONS"; // Reset do estado para o ecrã de texto
         resetAttempt();
         discoveryVisible = false;
         flashError = false;
+    } else if (gameState === "TAREFA8") { 
+        tarefa8State = "INSTRUCTIONS"; // Reset do estado para o ecrã de texto
+        stopTarefa8Audio(); 
+        resetTarefa8(); 
     }
-    else if (gameState === "TAREFA8") { 
-    stopTarefa8Audio(); // Para todos os loops imediatamente[cite: 20]
-    resetTarefa8(); 
-}
 }
 
 function calcularPopUpWide() {
@@ -291,6 +301,13 @@ function goTo(novoEstado, tipo = "NONE") {
         }
     }
 
+    if (novoEstado === "LIVRO") {
+        if (somAmbienteNave && somAmbienteNave.isLoaded() && !somAmbienteNave.isPlaying()) {
+            somAmbienteNave.loop(); // Toca em loop infinito
+            somAmbienteNave.setVolume(0.5); // Ajuste o volume conforme necessário (0.0 a 1.0)
+        }
+    }
+
     if (tipo === "FADE") {
         isFading = true;
     } 
@@ -299,6 +316,18 @@ function goTo(novoEstado, tipo = "NONE") {
     } 
     else {
         gameState = novoEstado; 
+    }
+
+    if (novoEstado.startsWith("TAREFA")) {
+        if (somAmbienteNave && somAmbienteNave.isPlaying()) {
+            somAmbienteNave.setVolume(0.1, 0.5); // Baixa para 10% de volume em 0.5 segundos
+        }
+    } 
+    // Se voltar para a nave ou livro, sobe o volume novamente
+    else if (novoEstado === "NAVE" || novoEstado === "LIVRO") {
+        if (somAmbienteNave && somAmbienteNave.isPlaying()) {
+            somAmbienteNave.setVolume(0.5, 0.5); // Sobe para 50% de volume
+        }
     }
 }
 
@@ -424,4 +453,77 @@ function mouseDragged() {
     if (gameState === "TAREFA7") {
         mouseDraggedTarefa7();
     }
+}
+
+function drawTaskInstructions(title, description) {
+    
+    // Fundo escuro sobre a tarefa
+    fill(0, 0, 0, 230);
+    rect(0, 0, WIDE_WIDTH, WIDE_HEIGHT);
+
+    push();
+    textAlign(CENTER, CENTER);
+    textFont('Impact');
+    
+    // Título em Ciano com Neon
+    drawingContext.shadowBlur = 15;
+    drawingContext.shadowColor = color(0, 255, 255);
+    fill(0, 255, 255);
+    textSize(40);
+    text(title.toUpperCase(), WIDE_WIDTH / 2, WIDE_HEIGHT / 2 - 80);
+
+    // Descrição em Branco (sem neon para legibilidade)
+    drawingContext.shadowBlur = 0;
+    fill(255);
+    textSize(18);
+    
+    // --- ADICIONA ESTA LINHA PARA EVITAR O BUG DO P5.JS ---
+    textAlign(CENTER, TOP); 
+    
+    // Wrap do texto para não sair das bordas
+    text(description, WIDE_WIDTH / 2 - 200, WIDE_HEIGHT / 2 - 30, 400, 150);
+
+    // --- DEPOIS VOLTA A PÔR AO CENTRO PARA O BOTÃO START ---
+    textAlign(CENTER, CENTER);
+
+    // Botão START
+    let btnX = WIDE_WIDTH / 2;
+    let btnY = WIDE_HEIGHT / 2 + 100;
+    let btnW = 150;
+    let btnH = 50;
+
+    // Detetar hover do rato (considerando a escala do pop-up)
+    let vmX = (mouseX - widePopX) / (widePopW / WIDE_WIDTH);
+    let vmY = (mouseY - widePopY) / (widePopH / WIDE_HEIGHT);
+    
+    if (vmX > btnX - btnW/2 && vmX < btnX + btnW/2 && vmY > btnY - btnH/2 && vmY < btnY + btnH/2) {
+        fill(0, 255, 100); // Verde no hover
+        cursor(HAND);
+    } else {
+        noFill();
+        stroke(255);
+    }
+    
+    strokeWeight(2);
+    rect(btnX - btnW/2, btnY - btnH/2, btnW, btnH, 10);
+    
+    // Texto do Botão
+    noStroke();
+    fill(255);
+    textSize(24);
+    text("START", btnX, btnY);
+    pop();
+}
+
+function checkStartClick() {
+    // Calculamos a posição do rato relativa ao sistema 800x450
+    let vmX = (mouseX - widePopX) / (widePopW / WIDE_WIDTH);
+    let vmY = (mouseY - widePopY) / (widePopH / WIDE_HEIGHT);
+    
+    // O botão está no centro (400) e a Y=325 (WIDE_HEIGHT/2 + 100)
+    // Largura 150 (metade=75) e Altura 50 (metade=25)
+    let btnX = 400;
+    let btnY = 325;
+    
+    return (vmX > btnX - 75 && vmX < btnX + 75 && vmY > btnY - 25 && vmY < btnY + 25);
 }

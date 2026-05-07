@@ -3,7 +3,7 @@ let circles4 = [];
 let score4 = 0;
 let lives4 = 3; 
 const GOAL4 = 10;
-let tarefa4State = 'PLAY';
+let tarefa4State = "INSTRUCTIONS";
 let som4; // Variável para a música
 
 function preloadTarefa4() {
@@ -26,51 +26,63 @@ function drawTarefa4() {
   imageMode(CORNER);
   image(bgImg4, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
 
-  if (tarefa4State === 'PLAY') {
-    // ── GESTÃO DA MÚSICA ──
-    if (som4.isLoaded() && !som4.isPlaying()) {
-      som4.loop();
-    }
-
-    displayHUD4();
-
-    // Spawna círculos a cada 60 frames (aprox. 1 segundo, no ritmo da batida)
-    if (frameCount % 60 === 0 && circles4.length < 3) {
-      circles4.push(new ClickCircle4());
-    }
-
-    for (let i = circles4.length - 1; i >= 0; i--) {
-      circles4[i].update();
-      circles4[i].show();
-
-      if (circles4[i].isExpired()) {
-        if (circles4[i].isClicked) {
-          score4++; 
-        } else {
-          lives4--; 
-          if (lives4 <= 0) {
-            tarefa4State = 'GAMEOVER';
-            if (som4.isPlaying()) som4.stop(); // Para a música na derrota
-          }
-        }
-        circles4.splice(i, 1);
+  // ── LÓGICA DE ESTADOS (INSTRUÇÕES VS JOGO) ──
+  if (tarefa4State === "INSTRUCTIONS") {
+    // Mostra o ecrã de instruções uniformizado
+    drawTaskInstructions(
+        "Superheroes", 
+        "CHARGE THE POWER. Click the energy spheres before they disappear. Each click charges your superpower, each miss weakens your shields."
+    );
+  } 
+  else {
+    // --- TUDO O QUE ESTÁ AQUI DENTRO SÓ ACONTECE DEPOIS DE CLICAR NO START ---
+    if (tarefa4State === 'PLAY') {
+      // ── GESTÃO DA MÚSICA ──
+      // A música agora só arranca porque o estado passou para PLAY
+      if (som4 && som4.isLoaded() && !som4.isPlaying()) {
+        som4.loop();
       }
-    }
 
-    if (score4 >= GOAL4) {
-      tarefa4State = 'WIN';
-      if (som4.isPlaying()) som4.stop(); // Para a música na vitória[cite: 16]
-      TarefaConcluida.super = true; 
-      setTimeout(() => {
-          goTo("NAVE");
-          resetGame4(); 
-      }, 1500);
+      displayHUD4();
+
+      // Spawna círculos a cada 60 frames (aprox. 1 segundo, no ritmo da batida)
+      if (frameCount % 60 === 0 && circles4.length < 3) {
+        circles4.push(new ClickCircle4());
+      }
+
+      for (let i = circles4.length - 1; i >= 0; i--) {
+        circles4[i].update();
+        circles4[i].show();
+
+        if (circles4[i].isExpired()) {
+          if (circles4[i].isClicked) {
+            score4++; 
+          } else {
+            lives4--; 
+            if (lives4 <= 0) {
+              tarefa4State = 'GAMEOVER';
+              if (som4.isPlaying()) som4.stop(); // Para a música na derrota
+            }
+          }
+          circles4.splice(i, 1);
+        }
+      }
+
+      if (score4 >= GOAL4) {
+        tarefa4State = 'WIN';
+        if (som4.isPlaying()) som4.stop(); // Para a música na vitória
+        TarefaConcluida.super = true; 
+        setTimeout(() => {
+            goTo("NAVE");
+            resetGame4(); 
+        }, 1500);
+      }
+      
+    } else if (tarefa4State === 'GAMEOVER') {
+      showFailScreenUniform();
+    } else if (tarefa4State === 'WIN') {
+      showWinScreenUniform();
     }
-    
-  } else if (tarefa4State === 'GAMEOVER') {
-    showFailScreenUniform();
-  } else if (tarefa4State === 'WIN') {
-    showWinScreenUniform();
   }
   
   pop(); 
@@ -122,9 +134,18 @@ function showWinScreenUniform() {
 
 
 function mousePressedTarefa4() {
+  // 1. Verificamos se estamos no ecrã de instruções
+  if (tarefa4State === "INSTRUCTIONS") {
+    if (checkStartClick()) {
+      tarefa4State = "PLAY"; 
+      // Não precisamos de pôr a música a tocar aqui, porque o drawTarefa4()
+      // vai ver que o estado é "PLAY" e toca a música automaticamente.
+    }
+    return; // Pára aqui para não clicar nos círculos acidentalmente!
+  }
+
+  // 2. A lógica antiga (Clicar nos círculos) só funciona se o estado for PLAY
   if (tarefa4State === 'PLAY') {
-    // --- MAGIA MATEMÁTICA ---
-    // Como a tela está encolhida, convertemos a posição real do rato para a posição virtual do jogo
     let virtualMouseX = (mouseX - widePopX) / (widePopW / WIDE_WIDTH);
     let virtualMouseY = (mouseY - widePopY) / (widePopH / WIDE_HEIGHT);
 

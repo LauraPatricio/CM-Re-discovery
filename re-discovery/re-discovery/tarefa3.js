@@ -1,7 +1,7 @@
 let bgImg3;
 let player3;
 let obstacles3 = [];
-let tarefa3State = 'PLAY';
+let tarefa3State = "INSTRUCTIONS";
 let som3; // Variável para a música
 
 // Timestamps em segundos onde o "Hey" acontece na música
@@ -27,6 +27,7 @@ function setupTarefa3() {
 }
 
 function drawTarefa3() {
+    // ── EFEITO POP-UP ──
     push();
     imageMode(CENTER);
     image(bgNave, width / 2, height / 2, naveNewW, naveNewH);
@@ -43,57 +44,68 @@ function drawTarefa3() {
     imageMode(CORNER);
     image(bgImg3, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
 
-    if (tarefa3State === 'PLAY') {
-    // Start music if it's not playing and we are in the PLAY state
-    if (som3 && som3.isLoaded() && !som3.isPlaying()) {
-        som3.loop();
-    }
-    
-    player3.update();
-        player3.show();
-        displayScore3();
+    // ── LÓGICA DE ESTADOS (INSTRUÇÕES VS JOGO) ──
+    if (tarefa3State === "INSTRUCTIONS") {
+        // Mostra o ecrã de instruções uniformizado
+        drawTaskInstructions(
+            "Crescendolls", 
+            "STAY IN THE RHYTHM. Jump over the obstacles, timing is everything, don't lose the beat!"
+        );
+    } 
+    else {
+        // --- TUDO O QUE ESTÁ AQUI SÓ ACONTECE DEPOIS DE CLICAR NO START ---
+        if (tarefa3State === 'PLAY') {
+            // Start music if it's not playing and we are in the PLAY state
+            if (som3 && som3.isLoaded() && !som3.isPlaying()) {
+                som3.loop();
+            }
+            
+            player3.update();
+            player3.show();
+            displayScore3();
 
-        let currentTime = som3.currentTime();
+            let currentTime = som3.currentTime();
 
-        if (nextHeyIndex < heyTimes.length && currentTime >= heyTimes[nextHeyIndex]) {
-            obstacles3.push(new Obstacle3(true)); // Criar obstáculo do tipo "Hey"
-            nextHeyIndex++;
-        }
+            if (nextHeyIndex < heyTimes.length && currentTime >= heyTimes[nextHeyIndex]) {
+                obstacles3.push(new Obstacle3(true)); // Criar obstáculo do tipo "Hey"
+                nextHeyIndex++;
+            }
 
-        for (let i = obstacles3.length - 1; i >= 0; i--) {
-            obstacles3[i].move();
-            obstacles3[i].show();
+            for (let i = obstacles3.length - 1; i >= 0; i--) {
+                obstacles3[i].move();
+                obstacles3[i].show();
 
-            if (!obstacles3[i].passed && obstacles3[i].x + obstacles3[i].w < player3.x) {
-                score3++;
-                obstacles3[i].passed = true;
+                if (!obstacles3[i].passed && obstacles3[i].x + obstacles3[i].w < player3.x) {
+                    score3++;
+                    obstacles3[i].passed = true;
 
-                if (score3 >= GOAL3) {
-                    tarefa3State = 'WIN';
+                    if (score3 >= GOAL3) {
+                        tarefa3State = 'WIN';
+                        if (som3.isPlaying()) som3.stop(); // STOP IMMEDIATELY
+                        TarefaConcluida.crescendolls = true;
+                        setTimeout(() => {
+                            goTo("NAVE");
+                            resetGame3();
+                        }, 1500);
+                    }
+                }
+
+                if (player3.hits(obstacles3[i])) {
+                    tarefa3State = 'GAMEOVER';
                     if (som3.isPlaying()) som3.stop(); // STOP IMMEDIATELY
-                    TarefaConcluida.crescendolls = true;
-                    setTimeout(() => {
-                        goTo("NAVE");
-                        resetGame3();
-                    }, 1500);
+                }
+
+                if (obstacles3[i].offscreen()) {
+                    obstacles3.splice(i, 1);
                 }
             }
-
-            if (player3.hits(obstacles3[i])) {
-                tarefa3State = 'GAMEOVER';
-                if (som3.isPlaying()) som3.stop(); // STOP IMMEDIATELY
-            }
-
-            if (obstacles3[i].offscreen()) {
-                obstacles3.splice(i, 1);
-            }
+        } else if (tarefa3State === 'GAMEOVER') {
+            if (som3.isPlaying()) som3.stop(); // Garante paragem no erro
+            showFailScreenUniform();
+        } else if (tarefa3State === 'WIN') {
+            if (som3.isPlaying()) som3.stop(); // Garante paragem na vitória
+            showWinScreenUniform();
         }
-    } else if (tarefa3State === 'GAMEOVER') {
-        if (som3.isPlaying()) som3.stop(); // Garante paragem no erro
-        showFailScreenUniform();
-    } else if (tarefa3State === 'WIN') {
-        if (som3.isPlaying()) som3.stop(); // Garante paragem na vitória
-        showWinScreenUniform();
     }
 
     pop();
@@ -161,8 +173,12 @@ function resetGame3() {
 }
 
 function mousePressedTarefa3() {
-    // This can stay empty if you only use the keyboard, 
-    // but the function MUST exist so menu.js doesn't crash.
+    if (tarefa3State === "INSTRUCTIONS") {
+        if (checkStartClick()) {
+            tarefa3State = "PLAY"; 
+            // A música será iniciada automaticamente no draw no próximo frame!
+        }
+    }
 }
 
 class Player3 {

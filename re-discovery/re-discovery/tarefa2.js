@@ -5,7 +5,7 @@ let buttons2 = []; // Renomeado para evitar conflitos
 
 let correctSequence = [];
 let playerSequence2 = [];
-let tarefa2State = 'MEMORIZE'; // IMPORTANTE: Renomeado para não chocar com o gameState do menu.js
+let tarefa2State = "INSTRUCTIONS";
 let sequenceIndex = 0;
 let displayWord = "";
 let loseTimer = 0;
@@ -73,7 +73,7 @@ function drawTarefa2() {
     // ── EFEITO POP-UP ──
     push();
     imageMode(CENTER);
-    image(bgNave, width/2, height/2,naveNewW, naveNewH );
+    image(bgNave, width/2, height/2, naveNewW, naveNewH);
     pop();
 
     noStroke();
@@ -85,18 +85,34 @@ function drawTarefa2() {
     image(bgImg2, t2_popX, t2_popY, t2_popW, t2_popH); // Imagem da tarefa
     pop();
 
-    // ── LÓGICA DO JOGO ──
-    if (tarefa2State === 'MEMORIZE') {
-        handleMemorizePhase();
-    } else if (tarefa2State === 'PLAY') {
-        drawNeonPhrase(playerSequence2, color(0, 255, 100));
-    } else if (tarefa2State === 'WIN') {
-        drawNeonPhrase(["MEMORY SYNCED"], color(0, 255, 100));
-    } else if (tarefa2State === 'LOSE') {
-        handleLoseState();
-    }
+    // ── LÓGICA DE ESTADOS (INSTRUÇÕES VS JOGO) ──
+    if (tarefa2State === "INSTRUCTIONS") {
+        // Mostra o ecrã de instruções uniformizado
+        push();
+        translate(t2_popX, t2_popY);
+        // Garante que a proporção bate certo com o tamanho do pop-up
+        scale(t2_popW / WIDE_WIDTH, t2_popH / WIDE_HEIGHT); 
+        drawTaskInstructions(
+            "Harder Better Faster Stronger", 
+            "SYNC THE VOCALS. Watch the lyrics flash on the screen. Once the sequence ends, click the buttons in the exact same order to reconstruct the code."
+        );
+        pop();
+    } 
+    else {
+        // --- TUDO O QUE ESTÁ AQUI SÓ ACONTECE DEPOIS DE CLICAR NO START ---
+        
+        if (tarefa2State === 'MEMORIZE') {
+            handleMemorizePhase();
+        } else if (tarefa2State === 'PLAY') {
+            drawNeonPhrase(playerSequence2, color(0, 255, 100));
+        } else if (tarefa2State === 'WIN') {
+            drawNeonPhrase(["MEMORY SYNCED"], color(0, 255, 100));
+        } else if (tarefa2State === 'LOSE') {
+            handleLoseState();
+        }
 
-    drawButtonsTarefa2();
+        drawButtonsTarefa2(); // Só desenha os botões se o jogo já tiver começado!
+    }
 }
 
 function handleMemorizePhase() {
@@ -163,11 +179,20 @@ function drawNeonPhrase(sequence, col) {
 }
 
 function mousePressedTarefa2() {
+    // 1. Verificar o botão Start no menu de instruções
+    if (tarefa2State === "INSTRUCTIONS") {
+        if (checkStartClick()) {
+            tarefa2State = "MEMORIZE"; // Muda de estado para começar a piscar as palavras
+        }
+        return; // Pára aqui
+    }
+
+    // 2. A tua lógica normal do jogo (só os cliques nas palavras)
+    // Só deixamos clicar se o estado for PLAY (depois de memorizar)
     if (tarefa2State !== 'PLAY') return;
 
     for (let b of buttons2) {
         if (mouseX > b.x && mouseX < b.x + b.w && mouseY > b.y && mouseY < b.y + b.h) {
-            // Toca o som da palavra ao clicar
             if (wordSounds[b.word]) wordSounds[b.word].play(); 
             checkInput(b.word);
             break;

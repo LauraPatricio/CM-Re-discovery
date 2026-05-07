@@ -5,6 +5,7 @@ let currentWord = "";
 let discoveryVisible = false;
 let errorTimer = 0;
 let flashError = false;
+let tarefa7State = "INSTRUCTIONS";
 
 const RING_X = 280; 
 const RING_Y = 450 / 2; 
@@ -33,18 +34,28 @@ function drawTarefa7() {
   translate(widePopX, widePopY);
   scale(widePopW / WIDE_WIDTH, widePopH / WIDE_HEIGHT);
 
+  // Certifique-se de que a variável bgImg7 está definida no seu preloadTarefa7
   imageMode(CORNER);
-  image(bgImg4, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
+  image(bgImg7, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
 
-  drawUIRing();
-  drawSyllables();
-  drawConnectionLine();
-  
-  // Checking the state to determine if we show the result or the uniform win screen
-  if (discoveryVisible) {
-    showWinScreenUniform7();
-  } else {
-    drawResultArea();
+  // ── LÓGICA DE ESTADOS (INSTRUÇÕES VS JOGO) ──
+  if (tarefa7State === "INSTRUCTIONS") {
+    drawTaskInstructions(
+        "Veridis Quo", 
+        "DECODE THE FRAGMENTS. Drag your mouse to connect the syllables in the correct order to reveal the secret message."
+    );
+  } 
+  else {
+    // --- LÓGICA ORIGINAL DO JOGO ---
+    drawUIRing();
+    drawSyllables();
+    drawConnectionLine();
+    
+    if (discoveryVisible) {
+      showWinScreenUniform7();
+    } else {
+      drawResultArea();
+    }
   }
   
   pop(); 
@@ -154,9 +165,27 @@ function showWinScreenUniform7() {
 
 
 function mousePressedTarefa7() {
-  if (!discoveryVisible) {
-    resetAttempt();
-    flashError = false; 
+  // 1. Verificar clique no botão de instruções
+  if (tarefa7State === "INSTRUCTIONS") {
+    if (checkStartClick()) {
+      tarefa7State = "PLAY"; // Define como PLAY para começar o jogo
+    }
+    return;
+  }
+
+  // 2. Lógica original de início de conexão
+  if (discoveryVisible) return;
+
+  let virtualMouseX = (mouseX - widePopX) / (widePopW / WIDE_WIDTH);
+  let virtualMouseY = (mouseY - widePopY) / (widePopH / WIDE_HEIGHT);
+
+  for (let i = 0; i < syllables.length; i++) {
+    let d = dist(virtualMouseX, virtualMouseY, syllables[i].x, syllables[i].y);
+    if (d < 40) {
+      playerPath = [i];
+      updateDisplayWord();
+      break;
+    }
   }
 }
 
