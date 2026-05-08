@@ -23,7 +23,8 @@ function preloadMemoria() {
 }
 
 function concluirComMemoria(tarefaKey) {
-    // Mudar o estado IMEDIATAMENTE para parar o draw da tarefa anterior
+    // Mudar o estado IMEDIATAMENTE para parar o desenho da tarefa anterior
+    // e permitir que o drawMemoriaScreen comece a desenhar o fundo da nave por trás
     gameState = "MEMORIA"; 
 
     if (memoriaVideo) {
@@ -39,39 +40,57 @@ function concluirComMemoria(tarefaKey) {
         return;
     }
 
+    // Criar o novo vídeo
     memoriaVideo = createVideo([src]);
     memoriaVideo.hide();
     memoriaVideo.elt.playsInline = true;
     
-    // Tocar som extra apenas se a tarefa NÃO for uma das musicais
+    // Tocar som extra apenas se a tarefa NÃO for uma das musicais nativas (3, 4, 5, 8)
     let tarefasMusicais = ['crescendolls', 'super', 'some', 'one'];
     if (!tarefasMusicais.includes(tarefaKey) && sonsExtraMemoria[tarefaKey]) {
         sonsExtraMemoria[tarefaKey].play();
     }
 
+    // --- LÓGICA DE FIM DE VÍDEO COM FADE SUAVE ---
     memoriaVideo.onended(() => {
+        // 1. Para todos os sons (música de fundo ou sons extra)
         pararTodosSonsTarefas(); 
-        if (sonsExtraMemoria[currentMemoriaKey]) sonsExtraMemoria[currentMemoriaKey].stop();
-        goTo("NAVE", "FADE");
-        memoriaVideo.remove();
-        memoriaVideo = null;
+        if (sonsExtraMemoria[currentMemoriaKey]) {
+            sonsExtraMemoria[currentMemoriaKey].stop();
+        }
+        
+        // 2. Inicia o FADE para a Nave
+        // Como o drawMemoriaScreen desenha a nave e a película por baixo do vídeo,
+        // o utilizador verá o vídeo a escurecer para a nave em vez de ver preto.
+        goTo("NAVE", "FADE"); 
+        
+        // 3. O SEGREDO: Manter o objeto do vídeo vivo durante o tempo do fade
+        // Esperamos 800ms antes de remover o vídeo do ecrã.
+        setTimeout(() => {
+            if (memoriaVideo) {
+                memoriaVideo.remove();
+                memoriaVideo = null;
+            }
+        }, 800);
     });
 
     memoriaVideo.play();
 }
 
+// Substitui a função drawMemoriaScreen por esta:
 function drawMemoriaScreen() {
-    // 1. Fundo da Nave e Película (igual às tarefas)
+    // 1. Desenha SEMPRE o fundo da Nave primeiro (como se fosse o papel de parede)
     push();
     imageMode(CENTER);
     image(bgNave, width / 2, height / 2, naveNewW, naveNewH);
     pop();
 
+    // 2. Película escura padrão das tarefas (180 de opacidade)
     noStroke();
     fill(0, 0, 0, 180);
     rect(0, 0, width, height);
 
-    // 2. Área do vídeo com escala widescreen
+    // 3. Área do vídeo
     push();
     translate(widePopX, widePopY);
     scale(widePopW / WIDE_WIDTH, widePopH / WIDE_HEIGHT);
@@ -80,7 +99,7 @@ function drawMemoriaScreen() {
         imageMode(CORNER);
         image(memoriaVideo, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
         
-        // Efeito Vignette (Fade out nas bordas)
+        // Vignette (Fade out nas bordas do vídeo)
         let grad = drawingContext.createRadialGradient(WIDE_WIDTH/2, WIDE_HEIGHT/2, WIDE_HEIGHT * 0.2, WIDE_WIDTH/2, WIDE_HEIGHT/2, WIDE_WIDTH * 0.7);
         grad.addColorStop(0, 'rgba(0,0,0,0)');
         grad.addColorStop(1, 'rgba(0,0,0,0.95)');

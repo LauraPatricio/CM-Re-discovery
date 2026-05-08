@@ -199,18 +199,35 @@ function initButtons() {
         baseW: width * 0.12, h: height * 0.07,
         w: width * 0.12, text: "ABOUT"
     };
+
+    // NOVOS: Botões para o ecrã final (Vitoria)
+    restartBtnFinal = {
+        x: width * 0.5, y: height * 0.75, // Posicionados no tapete do quarto
+        baseW: width * 0.15, h: height * 0.08,
+        w: width * 0.15, text: "RESTART"
+    };
+    aboutBtnFinal = {
+        x: width * 0.5, y: height * 0.86,
+        baseW: width * 0.12, h: height * 0.07,
+        w: width * 0.12, text: "ABOUT"
+    };
 }
 
 // ── Loop principal ────────────────────────────
 function draw() {
+    // Define o cursor padrão, a menos que uma transição de ruído esteja ativa
     if (transitionType !== "NOISE" && !isFading) cursor(ARROW);
 
+    // --- 1. DESENHAR O CENÁRIO ATUAL ---
+    // Importante: Desenhamos o estado ANTES da transição para que o fade 
+    // aconteça por cima da imagem que o utilizador está a ver.
+    
     if (gameState === "MENU") {
         drawMenu();
-    } else if (gameState === "ABOUT") { // <--- ADICIONA ESTA LINHA AQUI
+    } else if (gameState === "ABOUT") {
         drawAboutScreen();
-    } else if (gameState === "MEMORIA") { 
-        drawMemoriaScreen();  // <--- ADICIONA ISTO
+    } else if (gameState === "MEMORIA") {
+        drawMemoriaScreen(); 
     } else if (gameState === "QUARTO") {
         drawQuartoScreen(); 
     } else if (gameState === "LIVRO") {
@@ -237,15 +254,15 @@ function draw() {
         drawTarefa8();
     } else if (gameState === "VITORIA") { 
         drawVitoriaScreen();
-    } else if (gameState === "MEMORIA") {
-        drawMemoriaScreen();
     }
 
+    // --- 2. ELEMENTOS DE UI SOBREPOSTOS ---
     if (gameState.startsWith("TAREFA")) {
         drawUniversalExit();
     }
-    // Nota: MEMORIA não tem botão de exit — o clique já serve de skip/continuar
 
+    // --- 3. SISTEMA DE TRANSIÇÃO (A ÚLTIMA CAMADA) ---
+    // Esta função desenha o retângulo de transparência por cima de tudo o que foi feito acima
     handleTransition();
 }
 
@@ -334,7 +351,6 @@ function goTo(novoEstado, tipo = "NONE") {
 }
 
 function handleTransition() {
-    // 1. Transição: Fade a Preto
     if (transitionType === "FADE" || isFading) {
         if (isFading) {
             fadeAlpha += 10; 
@@ -348,30 +364,29 @@ function handleTransition() {
                 transitionType = "NONE";
             }
         }
+        
+        // Em vez de desenhar um retângulo preto, vamos desenhar 
+        // uma película que escurece suavemente o que está por baixo.
         push();
         noStroke();
-        fill(0, fadeAlpha);
+        fill(0, 0, 0, fadeAlpha); 
         rect(0, 0, width, height);
         pop();
     }
     // 2. Transição: Estática de TV (Noise)
     else if (transitionType === "NOISE") {
         noiseCounter++;
-        
         push();
         noStroke();
-        let pixelSize = 5; // Tamanho do "grão" da TV. Aumentar se o PC ficar lento.
-        
+        let pixelSize = 5; 
         for (let x = 0; x < width; x += pixelSize) {
             for (let y = 0; y < height; y += pixelSize) {
-                // Sorteia um tom de cinza/preto/branco para cada quadrado
                 fill(random(255)); 
                 rect(x, y, pixelSize, pixelSize);
             }
         }
         pop();
 
-        // Quando atingir a duração definida, faz a troca e desliga a transição
         if (noiseCounter >= noiseDuration) {
             gameState = nextState;
             transitionType = "NONE"; 
@@ -382,7 +397,6 @@ function handleTransition() {
 
 // ── Input ─────────────────────────────────────
 function mousePressed() {
-    // Ignora cliques enquanto houver uma transição a decorrer
     if (transitionType !== "NONE" || isFading) return; 
 
     if (gameState.startsWith("TAREFA")) {
@@ -390,64 +404,41 @@ function mousePressed() {
     }
     
     if (gameState === "MENU") {
-        // --- Clique no Botão START ---
-        if (
-            mouseX > startBtn.x - startBtn.w / 2 && mouseX < startBtn.x + startBtn.w / 2 &&
-            mouseY > startBtn.y - startBtn.h / 2 && mouseY < startBtn.y + startBtn.h / 2
-        ) {
+        if (mouseX > startBtn.x - startBtn.w/2 && mouseX < startBtn.x + startBtn.w/2 &&
+            mouseY > startBtn.y - startBtn.h/2 && mouseY < startBtn.y + startBtn.h/2) {
             let fs = fullscreen();
             fullscreen(!fs);
             goTo("QUARTO", "FADE"); 
         }
-        
-        // --- Clique no Botão ABOUT ---
-        if (
-            mouseX > aboutBtn.x - aboutBtn.w / 2 && mouseX < aboutBtn.x + aboutBtn.w / 2 &&
-            mouseY > aboutBtn.y - aboutBtn.h / 2 && mouseY < aboutBtn.y + aboutBtn.h / 2
-        ) {
-            goTo("ABOUT", "FADE"); // Usa o efeito Fade para entrar no About
+        if (mouseX > aboutBtn.x - aboutBtn.w/2 && mouseX < aboutBtn.x + aboutBtn.w/2 &&
+            mouseY > aboutBtn.y - aboutBtn.h/2 && mouseY < aboutBtn.y + aboutBtn.h/2) {
+            goTo("ABOUT", "FADE");
         }
     }
-    // --- LÓGICA DE CLIQUE NO ECRÃ ABOUT ---
     else if (gameState === "ABOUT") {
         let ex = width * 0.05; 
         let ey = height * 0.08; 
         let size = width * 0.025;
-        
-        // Se clicar na cruzinha, volta ao menu
         if (dist(mouseX, mouseY, ex, ey) < size / 2) {
-            goTo("MENU", "FADE"); 
+            // Se viemos do ecrã final, voltamos para lá, senão voltamos para o menu
+            if (vitoriaFase === 4) goTo("VITORIA", "FADE");
+            else goTo("MENU", "FADE"); 
         }
     }
-    else if (gameState === "QUARTO") {
-        handleQuartoClick(); 
-    } else if (gameState === "LIVRO") {
-        handleLivroClick();
-    } else if (gameState === "MENU_PERSONAGENS") {
-        handlePersonagensClick();
-    } else if (gameState === "NAVE") {
-        handleNaveClick(); 
-    } else if (gameState === "TAREFA1") {
-        mousePressedTarefa1();
-    } else if (gameState === "TAREFA2") {
-        mousePressedTarefa2();
-    } else if (gameState === "TAREFA3") {
-        mousePressedTarefa3();
-    } else if (gameState === "TAREFA4") {
-        mousePressedTarefa4();
-    } else if (gameState === "TAREFA5") {
-        mousePressedTarefa5();
-    } else if (gameState === "TAREFA6") {
-        mousePressedTarefa6();
-    } else if (gameState === "TAREFA7") {
-        mousePressedTarefa7();
-    } else if (gameState === "TAREFA8") {
-        mousePressedTarefa8();
-    } else if (gameState === "VITORIA") { 
-        handleVitoriaClick();
-    } else if (gameState === "MEMORIA") {
-        handleMemoriaClick();
-    }
+    else if (gameState === "QUARTO") { handleQuartoClick(); }
+    else if (gameState === "LIVRO") { handleLivroClick(); }
+    else if (gameState === "MENU_PERSONAGENS") { handlePersonagensClick(); }
+    else if (gameState === "NAVE") { handleNaveClick(); }
+    else if (gameState === "TAREFA1") { mousePressedTarefa1(); }
+    else if (gameState === "TAREFA2") { mousePressedTarefa2(); }
+    else if (gameState === "TAREFA3") { mousePressedTarefa3(); }
+    else if (gameState === "TAREFA4") { mousePressedTarefa4(); }
+    else if (gameState === "TAREFA5") { mousePressedTarefa5(); }
+    else if (gameState === "TAREFA6") { mousePressedTarefa6(); }
+    else if (gameState === "TAREFA7") { mousePressedTarefa7(); }
+    else if (gameState === "TAREFA8") { mousePressedTarefa8(); }
+    else if (gameState === "VITORIA") { handleVitoriaClick(); } // <--- Esta função está no vitoria.js
+    else if (gameState === "MEMORIA") { handleMemoriaClick(); }
 }
 
 function keyPressed() {

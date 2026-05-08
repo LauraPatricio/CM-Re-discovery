@@ -114,17 +114,40 @@ function drawVitoriaScreen() {
 }
 
 function _drawFinalUI() {
+    // Título final ou Créditos rápidos (opcional)
     push();
     textAlign(CENTER, CENTER);
     textFont('Impact');
-   fill(255);
-    textSize(width * 0.02);
-    text("RESTART", width / 2, height * 0.92);
+    fill(255);
+    textSize(width * 0.04);
+    // Efeito de brilho no título final
+    drawingContext.shadowBlur = 20;
+    drawingContext.shadowColor = color(62, 255, 81);
+    text("RE-DISCOVERY COMPLETE", width / 2, height * 0.45);
     pop();
+
+    // Atualiza e Desenha os botões usando as funções globais do menu.js
+    updateButton(restartBtnFinal);
+    updateButton(aboutBtnFinal);
+
+    drawButton(restartBtnFinal);
+    drawButton(aboutBtnFinal);
 }
 
 function handleVitoriaClick() {
+    // Só permite clique se a animação tiver acabado
     if (vitoriaFase === 4 && transitionType === "NONE") {
-        location.reload();
+        
+        // Clique no RESTART
+        if (mouseX > restartBtnFinal.x - restartBtnFinal.w/2 && mouseX < restartBtnFinal.x + restartBtnFinal.w/2 &&
+            mouseY > restartBtnFinal.y - restartBtnFinal.h/2 && mouseY < restartBtnFinal.y + restartBtnFinal.h/2) {
+            location.reload(); // Faz o refresh total da página
+        }
+        
+        // Clique no ABOUT
+        if (mouseX > aboutBtnFinal.x - aboutBtnFinal.w/2 && mouseX < aboutBtnFinal.x + aboutBtnFinal.w/2 &&
+            mouseY > aboutBtnFinal.y - aboutBtnFinal.h/2 && mouseY < aboutBtnFinal.y + aboutBtnFinal.h/2) {
+            goTo("ABOUT", "FADE");
+        }
     }
 }
