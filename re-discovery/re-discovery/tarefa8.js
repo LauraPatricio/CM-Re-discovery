@@ -171,13 +171,10 @@ function handleVinylPhase() {
 
  if (totalRotation >= TWO_PI * targetRotations && tarefa8phase === 2) {
     tarefa8phase = 3;
-    
-    // --- VITÓRIA E DESBLOQUEIO ---
     TarefaConcluida.one = true; 
-    
     setTimeout(() => {
-        resetTarefa8(); // Limpa primeiro
-        concluirComMemoria("one"); // Chama o vídeo
+        concluirComMemoria("one"); 
+        resetTarefa8(false); // Mantém o som
     }, 2000); 
   }
 }
@@ -227,28 +224,18 @@ function showFinalWin() {
   pop();
 }
 
-function resetTarefa8() {
-    tarefa8State = "INSTRUCTIONS"; // ADICIONAR ESTA LINHA AQUI!
+function resetTarefa8(pararSom = true) {
+    tarefa8State = "INSTRUCTIONS";
     tarefa8phase = 1;
     sliderY = 270;
     rotationAngle = 0;
     totalRotation = 0;
     isSpinning = false;
     winDelayTimer8 = 0;
-    
-    // Para todos os sons para reiniciar a sincronia
-    if (somDrums.isPlaying()) somDrums.stop();
-    if (somOneMore.isPlaying()) somOneMore.stop();
-    if (somStatic.isPlaying()) somStatic.stop();
-    
-    // Reinicia o setup de áudio
-    setupTarefa8();
+    if (pararSom) stopTarefa8Audio();
 }
 
 // Chamar isto no resetCurrentTask() do menu.js se gameState === "TAREFA8"[cite: 19]
 function stopTarefa8Audio() {
-    if (somDrums) somDrums.stop();
-    if (somOneMore) somOneMore.stop();
-    if (somStatic) somStatic.stop();
     isSpinning = false; // Garante que o estado de rotação é resetado[cite: 18]
 }

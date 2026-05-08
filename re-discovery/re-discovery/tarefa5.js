@@ -75,19 +75,13 @@ function drawTarefa5() {
       }
 
    if (currentRing >= GOAL5) {
-        // Inicia a contagem de 5 segundos com a música completa
-        winDelayTimer++;
-        if (winDelayTimer > 300) { // 300 frames aprox. 5 segundos a 60fps
-          tarefa5State = 'WIN';
-          TarefaConcluida.some = true;
-          
-          setTimeout(() => {
-            stopAllTracks();
-            resetGame5(); // Limpa as variáveis e volta para as INSTRUCTIONS
-            concluirComMemoria("some"); // Chama a memória de vídeo em vez de ir para a Nave!
-          }, 1500);
-        }
-      }
+    winDelayTimer++;
+    if (winDelayTimer > 300) {
+      TarefaConcluida.some = true;
+      concluirComMemoria("some");
+      resetGame5(false); // Mantém o som
+    }
+  }
     } else if (tarefa5State === 'WIN') {
       showWinScreenUniform();
     }
@@ -137,14 +131,18 @@ function showWinScreenUniform() {
 }
 
 function mousePressedTarefa5() {
-  // 1. Verificamos se estamos no ecrã de instruções
   if (tarefa5State === "INSTRUCTIONS") {
     if (checkStartClick()) {
-      tarefa5State = "PLAY"; 
-      // As músicas já estão a tocar em "mute" (volume 0) graças ao setupTarefa5(), 
-      // portanto não é preciso iniciar as tracks aqui!
+      tarefa5State = "PLAY";
+      // INICIA OS LOOPS AQUI após o clique
+      for (let t of tracks) {
+        if (!t.isPlaying()) {
+            t.setVolume(0);
+            t.loop();
+        }
+      }
     }
-    return; // Pára aqui para não clicar nos instrumentos acidentalmente
+    return;
   }
 
   // 2. Lógica do jogo (Clicar nos botões para sincronizar os anéis)
@@ -176,18 +174,13 @@ function stopAllTracks() {
   }
 }
 
-function resetGame5() {
+function resetGame5(pararSom = true) {
   currentRing = 0;
   winDelayTimer = 0;
-  stopAllTracks();
+  if (pararSom) stopAllTracks();
   for (let ring of rings) {
     ring.isSynced = false;
     ring.angle = random(TWO_PI);
-  }
-  // Reinicia a sincronia de áudio para um novo jogo
-  for (let t of tracks) {
-    t.setVolume(0);
-    t.loop();
   }
   tarefa5State = 'INSTRUCTIONS';
 }

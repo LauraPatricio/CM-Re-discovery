@@ -10,129 +10,84 @@ const MEMORIA_VIDEOS = {
     one:          'videos/memoria8.mp4',
 };
 
-let memoriaVideo      = null;   
-let memoriaNextState  = "NAVE"; 
-let memoriaEnded      = false; // Variável para sabermos se o vídeo já acabou
+let memoriaVideo = null;
+let sonsExtraMemoria = {};
+let currentMemoriaKey = "";
 
-// ── Entrada ───────────────────────────────────
+function preloadMemoria() {
+    // Carrega sons para tarefas que não têm música própria em loop
+    sonsExtraMemoria['aerodynamic'] = loadSound('sons/aerodynamic.mp3');
+    sonsExtraMemoria['harder'] = loadSound('sons/harder better faster stronger.mp3');
+    sonsExtraMemoria['veridis'] = loadSound('sons/veridisquo.mp3');
+    sonsExtraMemoria['voyager'] = loadSound('sons/voyager.mp3');
+}
+
 function concluirComMemoria(tarefaKey) {
-    // Remove vídeo anterior se existir
-    pararMemoria();
-    memoriaEnded   = false; // Reset da flag
+    // Mudar o estado IMEDIATAMENTE para parar o draw da tarefa anterior
+    gameState = "MEMORIA"; 
 
+    if (memoriaVideo) {
+        memoriaVideo.stop();
+        memoriaVideo.remove();
+    }
+    
+    currentMemoriaKey = tarefaKey;
     let src = MEMORIA_VIDEOS[tarefaKey];
+    
     if (!src) {
         goTo("NAVE");
         return;
     }
 
     memoriaVideo = createVideo([src]);
-    memoriaVideo.hide(); 
-    
+    memoriaVideo.hide();
     memoriaVideo.elt.playsInline = true;
-    memoriaVideo.elt.muted = false;
-
-    // --- MUDANÇA: Quando o vídeo acaba, apenas ativamos o ecrã de continuar ---
-    memoriaVideo.elt.addEventListener('ended', () => {
-        memoriaEnded   = true; 
-    });
-
-    let playPromise = memoriaVideo.elt.play();
-    if (playPromise !== undefined) {
-        playPromise.catch(() => {
-            // Se o autoplay falhar, deixamos continuar para não encravar o jogo
-            memoriaEnded   = true; 
-        });
+    
+    // Tocar som extra apenas se a tarefa NÃO for uma das musicais
+    let tarefasMusicais = ['crescendolls', 'super', 'some', 'one'];
+    if (!tarefasMusicais.includes(tarefaKey) && sonsExtraMemoria[tarefaKey]) {
+        sonsExtraMemoria[tarefaKey].play();
     }
 
-    goTo("MEMORIA");
+    memoriaVideo.onended(() => {
+        pararTodosSonsTarefas(); 
+        if (sonsExtraMemoria[currentMemoriaKey]) sonsExtraMemoria[currentMemoriaKey].stop();
+        goTo("NAVE", "FADE");
+        memoriaVideo.remove();
+        memoriaVideo = null;
+    });
+
+    memoriaVideo.play();
 }
 
-// ── Draw ──────────────────────────────────────
 function drawMemoriaScreen() {
-    // 1. Desenha o fundo da Nave
+    // 1. Fundo da Nave e Película (igual às tarefas)
     push();
     imageMode(CENTER);
     image(bgNave, width / 2, height / 2, naveNewW, naveNewH);
     pop();
 
-    // 2. Película escura
     noStroke();
     fill(0, 0, 0, 180);
     rect(0, 0, width, height);
 
-    // 3. Cálculo do Pop-up 4:3
-    let baseW = 600;
-    let baseH = 450;
-    
-    let memPopW = width * 0.65;
-    let memPopH = memPopW * (baseH / baseW);
-
-    if (memPopH > height * 0.65) {
-        memPopH = height * 0.65;
-        memPopW = memPopH * (baseW / baseH);
-    }
-
-    let memPopX = (width - memPopW) / 2;
-    let memPopY = (height - memPopH) / 2;
-
+    // 2. Área do vídeo com escala widescreen
     push();
-    translate(memPopX, memPopY);
-    scale(memPopW / baseW, memPopH / baseH);
+    translate(widePopX, widePopY);
+    scale(widePopW / WIDE_WIDTH, widePopH / WIDE_HEIGHT);
 
-    // Fundo do monitor
-    fill(0);
-    rect(0, 0, baseW, baseH);
-
-    // 4. Desenha o Vídeo
     if (memoriaVideo && memoriaVideo.elt.readyState >= 2) {
         imageMode(CORNER);
-        image(memoriaVideo, 0, 0, baseW, baseH);
+        image(memoriaVideo, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
+        
+        // Efeito Vignette (Fade out nas bordas)
+        let grad = drawingContext.createRadialGradient(WIDE_WIDTH/2, WIDE_HEIGHT/2, WIDE_HEIGHT * 0.2, WIDE_WIDTH/2, WIDE_HEIGHT/2, WIDE_WIDTH * 0.7);
+        grad.addColorStop(0, 'rgba(0,0,0,0)');
+        grad.addColorStop(1, 'rgba(0,0,0,0.95)');
+        
+        drawingContext.fillStyle = grad;
+        noStroke();
+        rect(0, 0, WIDE_WIDTH, WIDE_HEIGHT);
     }
-
-    // --- NOVO: Se o vídeo acabou, mostra o botão para continuar ---
-    if (memoriaEnded  ) {
-        cursor(HAND); // Muda o cursor para indicar que já se pode clicar
-        _drawContinueButton(baseW, baseH);
-    }
-
-    pop(); 
-}
-
-// Ecrã de "Continuar" após o vídeo
-function _drawContinueButton(vW, vH) {
-    // Escurece o último frame do vídeo ligeiramente
-    noStroke();
-    rect(0, 0, vW, vH);
-
-    push();
-    textAlign(CENTER, CENTER);
-    textFont('Impact');
-
-    drawingContext.shadowBlur = 15;
-    drawingContext.shadowColor = color(0, 255, 100);
-    
-    fill(0, 255, 100);
-    textSize(vW * 0.08);
-    text("CLICA PARA CONTINUAR", vW / 2, vH / 2);
-    
     pop();
-}
-
-// ── Input ─────────────────────────────────────
-function handleMemoriaClick() {
-    // O clique APENAS funciona se o vídeo já tiver terminado
-    if (memoriaEnded  ) {
-        pararMemoria();
-        goTo(memoriaNextState);
-    }
-}
-
-// ── Cleanup ───────────────────────────────────
-function pararMemoria() {
-    if (memoriaVideo) {
-        memoriaVideo.stop();
-        memoriaVideo.remove(); 
-        memoriaVideo = null;
-    }
 }

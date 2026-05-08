@@ -41,6 +41,7 @@ function preload() {
     preloadTarefa6();
     preloadTarefa7();
     preloadTarefa8();
+    preloadMemoria(); // ADICIONA ISTO AQUI!
     
 }
 
@@ -125,39 +126,37 @@ function checkUniversalExit() {
 }
 
 function resetCurrentTask() {
+    // Parar todos os sons antes de qualquer reset
+    pararTodosSonsTarefas();
+
     if (gameState === "TAREFA1") {
-        tarefa1State = "INSTRUCTIONS"; // Reset do estado para o ecrã de texto
+        tarefa1State = "INSTRUCTIONS";
         gameStatus = "";
         gameStarted = false;
     } else if (gameState === "TAREFA2") {
-        tarefa2State = "INSTRUCTIONS"; // Reset do estado para o ecrã de texto
+        tarefa2State = "INSTRUCTIONS";
         loseTimer = 0;
         playerSequence2 = []; 
         sequenceIndex = 0;
         displayWord = "";
     } else if (gameState === "TAREFA3") { 
-        tarefa3State = "INSTRUCTIONS"; // Reset do estado para o ecrã de texto
-        if (som3 && som3.isPlaying()) {
-            som3.stop();
-        }
-        resetGame3(); 
+        // Reset completo da tarefa 3
+        resetGame3(true); 
     } else if (gameState === "TAREFA4") {
-        tarefa4State = "INSTRUCTIONS"; // Reset do estado para o ecrã de texto
+        tarefa4State = "INSTRUCTIONS";
         resetGame4(); 
     } else if (gameState === "TAREFA5") {
-        tarefa5State = "INSTRUCTIONS"; // Reset do estado para o ecrã de texto
+        tarefa5State = "INSTRUCTIONS";
         resetGame5(); 
     } else if (gameState === "TAREFA6") {
-        tarefa6State = "INSTRUCTIONS"; // Reset do estado para o ecrã de texto
+        tarefa6State = "INSTRUCTIONS";
         resetGame6(); 
     } else if (gameState === "TAREFA7") {
-        tarefa7State = "INSTRUCTIONS"; // Reset do estado para o ecrã de texto
+        tarefa7State = "INSTRUCTIONS";
         resetAttempt();
         discoveryVisible = false;
-        flashError = false;
     } else if (gameState === "TAREFA8") { 
-        tarefa8State = "INSTRUCTIONS"; // Reset do estado para o ecrã de texto
-        stopTarefa8Audio(); 
+        tarefa8State = "INSTRUCTIONS";
         resetTarefa8(); 
     }
 }
@@ -210,6 +209,8 @@ function draw() {
         drawMenu();
     } else if (gameState === "ABOUT") { // <--- ADICIONA ESTA LINHA AQUI
         drawAboutScreen();
+    } else if (gameState === "MEMORIA") { 
+        drawMemoriaScreen();  // <--- ADICIONA ISTO
     } else if (gameState === "QUARTO") {
         drawQuartoScreen(); 
     } else if (gameState === "LIVRO") {
@@ -605,4 +606,11 @@ function drawAboutExitBtn() {
 
     image(exitImg, ex, ey, size, size);
     pop();
+}
+
+function pararTodosSonsTarefas() {
+    if (typeof som3 !== 'undefined' && som3.isPlaying()) som3.stop();
+    if (typeof som4 !== 'undefined' && som4.isPlaying()) som4.stop();
+    if (typeof stopAllTracks === 'function') stopAllTracks();
+    if (typeof stopTarefa8Audio === 'function') stopTarefa8Audio();
 }

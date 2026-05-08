@@ -43,73 +43,59 @@ function drawTarefa3() {
     imageMode(CORNER);
     image(bgImg3, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
 
-    // ── LÓGICA DE ESTADOS (INSTRUÇÕES VS JOGO) ──
+    // ── LÓGICA DE ESTADOS ──
     if (tarefa3State === "INSTRUCTIONS") {
-        // Mostra o ecrã de instruções uniformizado
         drawTaskInstructions(
             "Crescendolls", 
             "STAY IN THE RHYTHM. Jump over the obstacles, timing is everything, don't lose the beat!"
         );
     } 
-    else {
-        // --- TUDO O QUE ESTÁ AQUI SÓ ACONTECE DEPOIS DE CLICAR NO START ---
-        if (tarefa3State === 'PLAY') {
-            // Start music if it's not playing and we are in the PLAY state
-            if (som3 && som3.isLoaded() && !som3.isPlaying()) {
-                som3.loop();
-            }
-            
-            player3.update();
-            player3.show();
-            displayScore3();
-
-            let currentTime = som3.currentTime();
-
-            if (nextHeyIndex < heyTimes.length && currentTime >= heyTimes[nextHeyIndex]) {
-                obstacles3.push(new Obstacle3(true)); // Criar obstáculo do tipo "Hey"
-                nextHeyIndex++;
-            }
-
-            for (let i = obstacles3.length - 1; i >= 0; i--) {
-                obstacles3[i].move();
-                obstacles3[i].show();
-
-                if (!obstacles3[i].passed && obstacles3[i].x + obstacles3[i].w < player3.x) {
-                    score3++;
-                    obstacles3[i].passed = true;
-
-                    // --- CONDIÇÃO DE VITÓRIA (RESOLVIDA) ---
-                    if (score3 >= GOAL3) {
-                        tarefa3State = 'WIN';
-                        if (som3.isPlaying()) som3.stop(); // STOP IMMEDIATELY
-                        TarefaConcluida.crescendolls = true;
-                        
-                        setTimeout(() => {
-                            resetGame3(); // Limpa as variáveis e volta ao estado INSTRUCTIONS
-                            concluirComMemoria("crescendolls"); // Chama a memória de vídeo!
-                        }, 1500);
-                    }
-                }
-
-                // --- CONDIÇÃO DE DERROTA ---
-                if (player3.hits(obstacles3[i])) {
-                    tarefa3State = 'GAMEOVER';
-                    if (som3.isPlaying()) som3.stop(); // STOP IMMEDIATELY
-                }
-
-                if (obstacles3[i].offscreen()) {
-                    obstacles3.splice(i, 1);
-                }
-            }
-        } else if (tarefa3State === 'GAMEOVER') {
-            if (som3.isPlaying()) som3.stop(); // Garante paragem no erro
-            showFailScreenUniform();
-        } else if (tarefa3State === 'WIN') {
-            if (som3.isPlaying()) som3.stop(); // Garante paragem na vitória
-            showWinScreenUniform();
+    else if (tarefa3State === 'PLAY') {
+        if (som3 && som3.isLoaded() && !som3.isPlaying()) {
+            som3.loop();
         }
-    }
+        
+        player3.update();
+        player3.show();
+        displayScore3();
 
+        let currentTime = som3.currentTime();
+
+        if (nextHeyIndex < heyTimes.length && currentTime >= heyTimes[nextHeyIndex]) {
+            obstacles3.push(new Obstacle3(true)); 
+            nextHeyIndex++;
+        }
+
+        for (let i = obstacles3.length - 1; i >= 0; i--) {
+            let obs = obstacles3[i]; // Referência direta para segurança
+            
+            obs.move();
+            obs.show();
+
+            // 1. Verificar Colisão (Utilizando o método hits do PLAYER para maior estabilidade)
+            if (player3.hits(obs)) {
+                resetGame3(true); 
+                return; 
+            }
+
+            // 2. Verificar Passagem
+            if (!obs.passed && obs.x + obs.w < player3.x) {
+                score3++;
+                obs.passed = true;
+
+                if (score3 >= GOAL3) {
+                    TarefaConcluida.crescendolls = true;
+                    concluirComMemoria("crescendolls");
+                    resetGame3(false); 
+                    return;
+                }
+            }
+
+            if (obs.x < -100) {
+                obstacles3.splice(i, 1);
+            }
+        }
+    } 
     pop();
 }
 
@@ -160,15 +146,22 @@ function keyPressedTarefa3() {
     }
 }
 
-function resetGame3() {
+function resetGame3(pararSom = true) {
+    // 1. Limpar elementos do jogo
     obstacles3 = [];
     score3 = 0;
     nextHeyIndex = 0;
-    tarefa3State = 'INSTRUCTIONS'; // Volta ao início para a tua colega
+    
+    // 2. Repor estado para as instruções aparecerem da próxima vez
+    tarefa3State = "INSTRUCTIONS";
+    
+    // 3. Recriar o objeto do jogador
     player3 = new Player3();
-
-    // STOP the music to reset it, but do NOT call play() here.
-    if (som3 && som3.isLoaded()) {
+    
+    // 4. Controlo de Áudio
+    // Se pararSom for true (derrota ou reset manual), paramos a música.
+    // Se for false (vitória), a música continua para a memória.
+    if (pararSom && som3 && som3.isPlaying()) {
         som3.stop();
     }
 }

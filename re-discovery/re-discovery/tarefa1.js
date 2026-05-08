@@ -212,21 +212,12 @@ function handlePlayerInput(idx) {
         }, 1500);
     } else if (playerSequence.length === sequence.length) {
         gameStatus = "PASS";
-
-        // --- VITÓRIA E DESBLOQUEIO ---
         TarefaConcluida.aerodynamic = true;
-        
         setTimeout(() => {
-            // --- CONFLITO RESOLVIDO AQUI ---
-            // 1. Faz o reset da colega para as instruções aparecerem da próxima vez
-            tarefa1State = "INSTRUCTIONS"; 
-            gameStatus = "";     
-            
-            // 2. Chama a tua memória (que depois manda para a nave)
+            tarefa1State = "INSTRUCTIONS";
             concluirComMemoria("aerodynamic");
         }, 1500);
     }
-
     setTimeout(() => { interactiveButtons[idx].active = false; }, 200);
 }
 

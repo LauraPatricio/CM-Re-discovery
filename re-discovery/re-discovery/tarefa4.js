@@ -70,15 +70,10 @@ function drawTarefa4() {
 
       // --- CONDIÇÃO DE VITÓRIA RESOLVIDA ---
       if (score4 >= GOAL4) {
-        tarefa4State = 'WIN';
-        if (som4.isPlaying()) som4.stop(); // Para a música na vitória
-        TarefaConcluida.super = true; 
-        
-        setTimeout(() => {
-            resetGame4(); // Faz reset para as instruções
-            concluirComMemoria("super"); // Chama o vídeo em vez da nave!
-        }, 1500);
-      }
+      TarefaConcluida.super = true;
+      concluirComMemoria("super");
+      resetGame4(false); // Mantém o som
+    }
       
     } else if (tarefa4State === 'GAMEOVER') {
       showFailScreenUniform();
@@ -164,15 +159,12 @@ function keyPressedTarefa4() {
   }
 }
 
-function resetGame4() {
+function resetGame4(pararSom = true) {
   score4 = 0;
   lives4 = 3;
   circles4 = [];
-  tarefa4State = 'INSTRUCTIONS';
-  // Garante que a música para e faz reset
-  if (som4 && som4.isLoaded()) {
-    som4.stop();
-  }
+  tarefa4State = "INSTRUCTIONS";
+  if (pararSom && som4 && som4.isPlaying()) som4.stop();
 }
 
 class ClickCircle4 {
