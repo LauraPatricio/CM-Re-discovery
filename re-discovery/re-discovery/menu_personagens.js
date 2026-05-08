@@ -135,7 +135,7 @@ function drawCard(img, x, y, w, h, isUnlocked) {
                 noFill(); // O retângulo não tem cor por dentro, só nas bordas
                 
                 // Desenhamos a moldura brilhante exatamente por cima da carta
-                rect(x, y, w, h,1);
+                rect(x, y, w, h,10);
                 pop();
             }
             image(img, x, y, w, h);

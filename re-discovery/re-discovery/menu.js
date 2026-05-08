@@ -41,7 +41,7 @@ function preload() {
     preloadTarefa6();
     preloadTarefa7();
     preloadTarefa8();
-    
+
 }
 
 // ── Setup ─────────────────────────────────────
@@ -409,7 +409,7 @@ function mousePressed() {
     }
     // --- LÓGICA DE CLIQUE NO ECRÃ ABOUT ---
     else if (gameState === "ABOUT") {
-        let ex = width * 0.05; 
+        let ex = width * 0.95; 
         let ey = height * 0.08; 
         let size = width * 0.025;
         
@@ -573,6 +573,8 @@ function drawAboutScreen() {
 
     // Corpo de Texto
     drawingContext.shadowBlur = 0;
+    textFont('Futura');
+    textStyle(NORMAL);
     fill(255);
     textSize(max(18, width * 0.015)); // Tamanho responsivo, mas nunca menor que 18
     textAlign(CENTER, TOP); // Alinha pelo topo para o wrap funcionar bem
@@ -590,7 +592,7 @@ function drawAboutScreen() {
 
 function drawAboutExitBtn() {
     // Posição no canto superior esquerdo
-    let ex = width * 0.05; 
+    let ex = width * 0.95; 
     let ey = height * 0.08; 
     let size = width * 0.025; // O mesmo tamanho do teu exit universal
 
