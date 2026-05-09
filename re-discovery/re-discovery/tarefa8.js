@@ -34,15 +34,7 @@ function preloadTarefa8() {
 }
 
 function setupTarefa8() {
-  // Inicia a estática, mas começa muda até o utilizador arrastar
-  somStatic.loop();
-  somStatic.setVolume(0);
 
-  // Inicia bateria e melodia juntas (em mute) para garantir sincronia total[cite: 17]
-  somDrums.setVolume(0);
-  somOneMore.setVolume(0);
-  somDrums.loop();
-  somOneMore.loop();
 }
 
 function drawTarefa8() {
@@ -180,23 +172,29 @@ function handleVinylPhase() {
 }
 
 function mousePressedTarefa8() {
-  // 1. Verificar clique no botão de instruções
   if (tarefa8State === "INSTRUCTIONS") {
     if (checkStartClick()) {
-      tarefa8State = "PLAY"; // Ativa o bloco 'else' no draw
-      tarefa8phase = 1;      // Inicia efetivamente o jogo na Fase 1
+      tarefa8State = "PLAY";
+      tarefa8phase = 1;
+
+      // INICIAR ÁUDIO APÓS INTERAÇÃO HUMANA
+      if (somStatic && somStatic.isLoaded() && !somStatic.isPlaying()) {
+          somStatic.loop(); 
+          somStatic.setVolume(0);
+          somDrums.loop(); 
+          somDrums.setVolume(0);
+          somOneMore.loop(); 
+          somOneMore.setVolume(0);
+      }
     }
     return;
   }
 
-  // 2. Lógica original de interação (Slider e Vinil)
   if (tarefa8phase === 1) {
     if (sliderY > greenZoneY && sliderY < greenZoneY + greenZoneH) {
       tarefa8phase = 2;
     }
   }
-  // A lógica de arrastar o vinil é gerida dentro do handleVinylPhase() 
-  // que utiliza mouseIsPressed, por isso não precisa de código extra aqui.
 }
 
 function showFinalWin() {
@@ -236,6 +234,11 @@ function resetTarefa8(pararSom = true) {
 }
 
 // Chamar isto no resetCurrentTask() do menu.js se gameState === "TAREFA8"[cite: 19]
+// Substitui a função stopTarefa8Audio por esta completa
+// Atualiza a função no tarefa8.js para parar mesmo os sons
 function stopTarefa8Audio() {
-    isSpinning = false; // Garante que o estado de rotação é resetado[cite: 18]
+    isSpinning = false;
+    if (somDrums && typeof somDrums.stop === 'function') somDrums.stop();
+    if (somOneMore && typeof somOneMore.stop === 'function') somOneMore.stop();
+    if (somStatic && typeof somStatic.stop === 'function') somStatic.stop();
 }

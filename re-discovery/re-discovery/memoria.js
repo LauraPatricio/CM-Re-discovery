@@ -23,8 +23,14 @@ function preloadMemoria() {
 }
 
 function concluirComMemoria(tarefaKey) {
-    // Mudar o estado IMEDIATAMENTE para parar o desenho da tarefa anterior
     gameState = "MEMORIA"; 
+
+    // --- VERIFICAÇÃO CRUCIAL DE VITÓRIA FINAL ---
+    // Se a tarefa 5 e a tarefa 8 já estiverem marcadas como concluídas,
+    // ativamos a flag global para impedir que a música pare no fim do vídeo.
+    if (TarefaConcluida.some && TarefaConcluida.one) {
+        isFinalVictory = true;
+    }
 
     if (memoriaVideo) {
         memoriaVideo.stop();
@@ -33,34 +39,26 @@ function concluirComMemoria(tarefaKey) {
     
     currentMemoriaKey = tarefaKey;
     let src = MEMORIA_VIDEOS[tarefaKey];
-    
-    if (!src) {
-        goTo("NAVE");
-        return;
-    }
+    if (!src) { goTo("NAVE"); return; }
 
-    // Criar o novo vídeo
     memoriaVideo = createVideo([src]);
     memoriaVideo.hide();
     memoriaVideo.elt.playsInline = true;
     
-    // Tocar som extra apenas se a tarefa NÃO for uma das musicais nativas (3, 4, 5, 8)
     let tarefasMusicais = ['crescendolls', 'super', 'some', 'one'];
     if (!tarefasMusicais.includes(tarefaKey) && sonsExtraMemoria[tarefaKey]) {
         sonsExtraMemoria[tarefaKey].play();
     }
 
-    // --- FIM DE VÍDEO AUTOMÁTICO ---
     memoriaVideo.onended(() => {
+        // Se isFinalVictory for true, esta função no menu.js não fará nada!
         pararTodosSonsTarefas(); 
+        
         if (sonsExtraMemoria[currentMemoriaKey]) {
             sonsExtraMemoria[currentMemoriaKey].stop();
         }
         
-        // Inicia o FADE para a Nave
         goTo("NAVE", "FADE"); 
-        
-        // Mantemos o vídeo vivo por 800ms para o fade o cobrir suavemente
         setTimeout(() => {
             if (memoriaVideo) {
                 memoriaVideo.remove();

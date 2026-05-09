@@ -15,6 +15,7 @@ let noiseDuration = 30;      // Duração da estática (30 frames = aprox. meio 
 let noiseCounter = 0;
 
 let somAmbienteNave;
+let isFinalVictory = false;
 
 // Proporção popup
 let widePopX, widePopY, widePopW, widePopH;
@@ -323,38 +324,37 @@ function drawButton(btn) {
 }
 
 // ── Sistema Dinâmico de Transições ──────────────────
-// --- NOVO: Função goTo atualizada para gerir múltiplos efeitos ---
+// Atualiza a função goTo para silenciar a nave no final
 function goTo(novoEstado, tipo = "NONE") {
     nextState = novoEstado;
     transitionType = tipo;
-    
 
     if (novoEstado === "LIVRO") {
         if (somAmbienteNave && somAmbienteNave.isLoaded() && !somAmbienteNave.isPlaying()) {
-            somAmbienteNave.loop(); // Toca em loop infinito
-            somAmbienteNave.setVolume(0.5); // Ajuste o volume conforme necessário (0.0 a 1.0)
+            somAmbienteNave.loop();
+            somAmbienteNave.setVolume(0.5);
         }
     }
 
     if (tipo === "FADE") {
         isFading = true;
-    } 
-    else if (tipo === "NOISE") {
-        noiseCounter = 0; 
-    } 
-    else {
-        gameState = novoEstado; 
+    } else if (tipo === "NOISE") {
+        noiseCounter = 0;
+    } else {
+        gameState = novoEstado;
     }
 
-    if (novoEstado.startsWith("TAREFA")) {
-        if (somAmbienteNave && somAmbienteNave.isPlaying()) {
-            somAmbienteNave.setVolume(0.1, 0.5); // Baixa para 10% de volume em 0.5 segundos
+    // LÓGICA DE ÁUDIO AMBIENTE
+    if (somAmbienteNave && somAmbienteNave.isPlaying()) {
+        if (novoEstado.startsWith("TAREFA")) {
+            somAmbienteNave.setVolume(0.1, 0.5);
+        } 
+        // Se for a vitória final, desligamos o som da nave para não baralhar com a música
+        else if (isFinalVictory || novoEstado === "VITORIA") {
+            somAmbienteNave.stop(); 
         }
-    } 
-    // Se voltar para a nave ou livro, sobe o volume novamente
-    else if (novoEstado === "NAVE" || novoEstado === "LIVRO") {
-        if (somAmbienteNave && somAmbienteNave.isPlaying()) {
-            somAmbienteNave.setVolume(0.5, 0.5); // Sobe para 50% de volume
+        else if (novoEstado === "NAVE" || novoEstado === "LIVRO") {
+            somAmbienteNave.setVolume(0.5, 0.5);
         }
     }
 }
@@ -611,8 +611,11 @@ function drawAboutExitBtn() {
 }
 
 function pararTodosSonsTarefas() {
-    if (typeof som3 !== 'undefined' && som3.isPlaying()) som3.stop();
-    if (typeof som4 !== 'undefined' && som4.isPlaying()) som4.stop();
+    // Se for a vitória final (isFinalVictory é true), saímos da função sem parar nada!
+    if (isFinalVictory) return; 
+
+    if (typeof som3 !== 'undefined' && som3 && som3.isPlaying()) som3.stop();
+    if (typeof som4 !== 'undefined' && som4 && som4.isPlaying()) som4.stop();
     if (typeof stopAllTracks === 'function') stopAllTracks();
     if (typeof stopTarefa8Audio === 'function') stopTarefa8Audio();
 }

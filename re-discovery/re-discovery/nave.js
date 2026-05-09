@@ -140,9 +140,9 @@ function configurarBotoesNave() {
     }
 }
 
-// Verifica se o personagem terminou as suas duas tarefas
+// Substitui a função verificarProgressoNave por esta
 function verificarProgressoNave() {
-    if (_missaoConcluida) return; // impede loop infinito frame-a-frame
+    if (_missaoConcluida) return; 
 
     let concluiu = false;
     let destino  = "MENU_PERSONAGENS";
@@ -160,15 +160,17 @@ function verificarProgressoNave() {
         concluiu = true;
     }
     else if (personagemAtual === "STELLA" && TarefaConcluida.some && TarefaConcluida.one) {
-        destino  = "VITORIA";
+        // --- VITÓRIA TOTAL DETETADA ---
+        destino = "VITORIA";
         concluiu = true;
+        isFinalVictory = true; // Ativa a flag para a música continuar em loop
     }
 
     if (concluiu) {
         _missaoConcluida = true;
         personagemAtual  = "";
         if (destino === "VITORIA") {
-            iniciarCenaFinal(); // inicia a animação e faz goTo("VITORIA") internamente
+            iniciarCenaFinal(); 
         } else {
             goTo(destino);
         }
