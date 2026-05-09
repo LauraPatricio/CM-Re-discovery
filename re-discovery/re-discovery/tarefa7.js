@@ -120,9 +120,9 @@ function drawResultArea() {
     drawingContext.shadowColor = color(255, 0, 0); // Brilho Neon Vermelho
     fill(255, 50, 50);
     
-    // Tamanho proporcional ao pop-up (WIDE_WIDTH * 0.08) para impacto visual[cite: 1]
+    // Tamanho proporcional ao pop-up (WIDE_WIDTH * 0.08) para impacto visual
     textSize(WIDE_WIDTH * 0.08); 
-    text("FAILED", displayX, 230); // Texto em CAIXA ALTA uniforme[cite: 1]
+    text("FAILED", displayX, 230); // Texto em CAIXA ALTA uniforme
     pop();
     
     errorTimer--;
@@ -138,7 +138,7 @@ function drawResultArea() {
     drawingContext.shadowBlur = 15;
     drawingContext.shadowColor = color(0, 255, 100);
     textSize(40);
-    text(currentWord.toUpperCase(), displayX, 230); // UPPERCASE uniforme[cite: 1]
+    text(currentWord.toUpperCase(), displayX, 220); // UPPERCASE uniforme[cite: 1]
     pop();
   }
   
