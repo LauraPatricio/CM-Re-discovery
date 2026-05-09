@@ -1,13 +1,13 @@
 // Mapa de tarefa → ficheiro de vídeo
 const MEMORIA_VIDEOS = {
-    aerodynamic:  'videos/memoria1.mp4',
-    harder:       'videos/memoria2.mp4',
-    crescendolls: 'videos/memoria3.mp4',
-    super:        'videos/memoria4.mp4',
-    some:         'videos/memoria5.mp4',  
-    veridis:      'videos/memoria6.mp4',
-    voyager:      'videos/memoria7.mp4',
-    one:          'videos/memoria8.mp4',
+    aerodynamic:  'videos/memoria1.webm',
+    harder:       'videos/memoria2.webm',
+    crescendolls: 'videos/memoria3.webm',
+    super:        'videos/memoria4.webm',
+    some:         'videos/memoria5.webm',  
+    veridis:      'videos/memoria6.webm',
+    voyager:      'videos/memoria7.webm',
+    one:          'videos/memoria8.webm',
 };
 
 let memoriaVideo      = null;   
@@ -81,8 +81,9 @@ function drawMemoriaScreen() {
     scale(memPopW / baseW, memPopH / baseH);
 
     // Fundo do monitor
-    fill(0);
-    rect(0, 0, baseW, baseH);
+    // --- CORREÇÃO AQUI ---
+    // Removido o rect() para que o webm fique totalmente sem fundo!
+    // Se quiseres testar com os mp4, podes voltar a colocar um fundo aqui se precisares.
 
     // 4. Desenha o Vídeo
     if (memoriaVideo && memoriaVideo.elt.readyState >= 2) {
@@ -91,7 +92,7 @@ function drawMemoriaScreen() {
     }
 
     // --- NOVO: Se o vídeo acabou, mostra o botão para continuar ---
-    if (memoriaEnded  ) {
+    if (memoriaEnded) {
         cursor(HAND); // Muda o cursor para indicar que já se pode clicar
         _drawContinueButton(baseW, baseH);
     }
@@ -103,6 +104,7 @@ function drawMemoriaScreen() {
 function _drawContinueButton(vW, vH) {
     // Escurece o último frame do vídeo ligeiramente
     noStroke();
+   noFill();
     rect(0, 0, vW, vH);
 
     push();
@@ -112,7 +114,9 @@ function _drawContinueButton(vW, vH) {
     drawingContext.shadowBlur = 15;
     drawingContext.shadowColor = color(0, 255, 100);
     
-    fill(0, 255, 100);
+    // --- CORREÇÃO AQUI ---
+    // Descomentei o fill para o texto não desaparecer
+    fill(0, 255, 100); 
     textSize(vW * 0.08);
     text("CLICA PARA CONTINUAR", vW / 2, vH / 2);
     
@@ -122,7 +126,7 @@ function _drawContinueButton(vW, vH) {
 // ── Input ─────────────────────────────────────
 function handleMemoriaClick() {
     // O clique APENAS funciona se o vídeo já tiver terminado
-    if (memoriaEnded  ) {
+    if (memoriaEnded) {
         pararMemoria();
         goTo(memoriaNextState);
     }
