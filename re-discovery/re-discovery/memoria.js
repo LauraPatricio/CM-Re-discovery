@@ -1,13 +1,13 @@
 // Mapa de tarefa → ficheiro de vídeo
 const MEMORIA_VIDEOS = {
-    aerodynamic:  'videos/memoria1.mp4',
-    harder:       'videos/memoria2.mp4',
-    crescendolls: 'videos/memoria3.mp4',
-    super:        'videos/memoria4.mp4',
-    some:         'videos/memoria5.mp4',  
-    veridis:      'videos/memoria6.mp4',
-    voyager:      'videos/memoria7.mp4',
-    one:          'videos/memoria8.mp4',
+    aerodynamic:  'videos/memoria1.webm',
+    harder:       'videos/memoria2.webm',
+    crescendolls: 'videos/memoria3.webm',
+    super:        'videos/memoria4.webm',
+    some:         'videos/memoria5.webm',  
+    veridis:      'videos/memoria6.webm',
+    voyager:      'videos/memoria7.webm',
+    one:          'videos/memoria8.webm',
 };
 
 let memoriaVideo = null;
@@ -24,7 +24,6 @@ function preloadMemoria() {
 
 function concluirComMemoria(tarefaKey) {
     // Mudar o estado IMEDIATAMENTE para parar o desenho da tarefa anterior
-    // e permitir que o drawMemoriaScreen comece a desenhar o fundo da nave por trás
     gameState = "MEMORIA"; 
 
     if (memoriaVideo) {
@@ -51,21 +50,17 @@ function concluirComMemoria(tarefaKey) {
         sonsExtraMemoria[tarefaKey].play();
     }
 
-    // --- LÓGICA DE FIM DE VÍDEO COM FADE SUAVE ---
+    // --- FIM DE VÍDEO AUTOMÁTICO ---
     memoriaVideo.onended(() => {
-        // 1. Para todos os sons (música de fundo ou sons extra)
         pararTodosSonsTarefas(); 
         if (sonsExtraMemoria[currentMemoriaKey]) {
             sonsExtraMemoria[currentMemoriaKey].stop();
         }
         
-        // 2. Inicia o FADE para a Nave
-        // Como o drawMemoriaScreen desenha a nave e a película por baixo do vídeo,
-        // o utilizador verá o vídeo a escurecer para a nave em vez de ver preto.
+        // Inicia o FADE para a Nave
         goTo("NAVE", "FADE"); 
         
-        // 3. O SEGREDO: Manter o objeto do vídeo vivo durante o tempo do fade
-        // Esperamos 800ms antes de remover o vídeo do ecrã.
+        // Mantemos o vídeo vivo por 800ms para o fade o cobrir suavemente
         setTimeout(() => {
             if (memoriaVideo) {
                 memoriaVideo.remove();
@@ -77,20 +72,19 @@ function concluirComMemoria(tarefaKey) {
     memoriaVideo.play();
 }
 
-// Substitui a função drawMemoriaScreen por esta:
 function drawMemoriaScreen() {
-    // 1. Desenha SEMPRE o fundo da Nave primeiro (como se fosse o papel de parede)
+    // 1. Desenha o fundo da Nave por baixo
     push();
     imageMode(CENTER);
     image(bgNave, width / 2, height / 2, naveNewW, naveNewH);
     pop();
 
-    // 2. Película escura padrão das tarefas (180 de opacidade)
+    // 2. Película escura
     noStroke();
     fill(0, 0, 0, 180);
     rect(0, 0, width, height);
 
-    // 3. Área do vídeo
+    // 3. Área do vídeo com a escala unificada do menu.js
     push();
     translate(widePopX, widePopY);
     scale(widePopW / WIDE_WIDTH, widePopH / WIDE_HEIGHT);
@@ -99,14 +93,55 @@ function drawMemoriaScreen() {
         imageMode(CORNER);
         image(memoriaVideo, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
         
-        // Vignette (Fade out nas bordas do vídeo)
+        // Efeito Vignette (Sombra nas bordas)
         let grad = drawingContext.createRadialGradient(WIDE_WIDTH/2, WIDE_HEIGHT/2, WIDE_HEIGHT * 0.2, WIDE_WIDTH/2, WIDE_HEIGHT/2, WIDE_WIDTH * 0.7);
         grad.addColorStop(0, 'rgba(0,0,0,0)');
         grad.addColorStop(1, 'rgba(0,0,0,0.95)');
         
         drawingContext.fillStyle = grad;
         noStroke();
+        noFill();
         rect(0, 0, WIDE_WIDTH, WIDE_HEIGHT);
     }
     pop();
+}
+// Ecrã de "Continuar" após o vídeo
+function _drawContinueButton(vW, vH) {
+    // Escurece o último frame do vídeo ligeiramente
+    noStroke();
+   noFill();
+    rect(0, 0, vW, vH);
+
+    push();
+    textAlign(CENTER, CENTER);
+    textFont('Impact');
+
+    drawingContext.shadowBlur = 15;
+    drawingContext.shadowColor = color(0, 255, 100);
+    
+    // --- CORREÇÃO AQUI ---
+    // Descomentei o fill para o texto não desaparecer
+    fill(0, 255, 100); 
+    textSize(vW * 0.08);
+    text("CLICA PARA CONTINUAR", vW / 2, vH / 2);
+    
+    pop();
+}
+
+// ── Input ─────────────────────────────────────
+function handleMemoriaClick() {
+    // O clique APENAS funciona se o vídeo já tiver terminado
+    if (memoriaEnded) {
+        pararMemoria();
+        goTo(memoriaNextState);
+    }
+}
+
+// ── Cleanup ───────────────────────────────────
+function pararMemoria() {
+    if (memoriaVideo) {
+        memoriaVideo.stop();
+        memoriaVideo.remove(); 
+        memoriaVideo = null;
+    }
 }
