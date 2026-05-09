@@ -222,8 +222,14 @@ function handlePlayerInput(idx) {
 }
 
 function startNewRound() {
-    sequence = [0, 1, 2, 3, 4];
-    shuffle(sequence, true);
+    sequence = [];
+    
+    // Gera uma sequência de 5 passos, escolhendo aleatoriamente entre os 9 botões (0 a 8)
+    for (let i = 0; i < 5; i++) {
+        let randomButton = floor(random(9)); // Escolhe um número inteiro de 0 a 8
+        sequence.push(randomButton);
+    }
+    
     playerSequence = [];
     isShowing = true;
     step = 0;
