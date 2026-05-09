@@ -23,7 +23,7 @@ const WIDE_WIDTH = 800;
 const WIDE_HEIGHT = 450;
 
 
-let somGlass; // Nova variável
+let somGlass; 
 
 function preload() {
     bgMenu = loadImage('imagens/fundo.png');
