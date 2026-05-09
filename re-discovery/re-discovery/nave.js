@@ -37,6 +37,8 @@ function preloadNave() {
     }
 }
 
+let nivelVidroAnterior = 0; // Variável para monitorizar mudanças
+
 function drawNave() {
     background(0);
     let larguraEscalada = bgNave.width * scaleRatioNave;
@@ -48,21 +50,23 @@ function drawNave() {
     imageMode(CORNER);
     image(bgNave, 0, 0);
 
-    // ─── NOVO: LÓGICA DO VIDRO RACHADO COM BLENDMODE ──────────────
-    let nivelVidro = 0;
+    // ─── LÓGICA DO VIDRO RACHADO ──────────────
+    let nivelVidroAtual = 0;
 
-    // Reaproveitamos a lógica do disco: 
-    // Cada vez que um personagem novo é desbloqueado, a racha avança!
-    if (personagensStatus.arpegius) nivelVidro = 1; // Baryl terminou
-    if (personagensStatus.octave) nivelVidro = 2;   // Arpegius terminou (Tarefas 1 e 2 completas)
-    if (personagensStatus.stella) nivelVidro = 3;   // Octave terminou
-    // Desenha a racha sobre o ecrã
-    // Adicionamos a condição "&& imgVidros[nivelVidro]" para que o jogo não dê erro
-    // enquanto não tiveres o vidro3 e vidro4 desenhados!
-    if (nivelVidro > 0 && imgVidros[nivelVidro]) {
-        blendMode(SCREEN); // Faz o preto ficar invisível e o branco brilhar
-        image(imgVidros[nivelVidro], 0, 0, bgNave.width, bgNave.height);
-        blendMode(BLEND);  // IMPORTANTE: Voltar ao modo normal para não estragar os botões!
+    if (personagensStatus.arpegius) nivelVidroAtual = 1; 
+    if (personagensStatus.octave) nivelVidroAtual = 2;   
+    if (personagensStatus.stella) nivelVidroAtual = 3;   
+
+    // --- NOVO: Detetar se a racha aumentou para tocar o som ---
+    if (nivelVidroAtual > nivelVidroAnterior) {
+        tocarSomRacha(); // Chama a função que criámos no menu.js
+        nivelVidroAnterior = nivelVidroAtual; // Atualiza para não tocar em loop
+    }
+
+    if (nivelVidroAtual > 0 && imgVidros[nivelVidroAtual]) {
+        blendMode(SCREEN); 
+        image(imgVidros[nivelVidroAtual], 0, 0, bgNave.width, bgNave.height);
+        blendMode(BLEND);  
     }
 
     // --- DESENHAR OS BOTÕES ---
@@ -75,7 +79,7 @@ function drawNave() {
     drawBtnImagem(1184, 839, btnNave.btnSome, TarefaConcluida.some, buttonLine["Some"], buttonHover["Some"], buttonConc["Some"]);
     drawBtnImagem(522, 850, btnNave.btnOne, TarefaConcluida.one, buttonLine["One"], buttonHover["One"], buttonConc["One"]);
 
-    pop(); // <-- FECHA AQUI O BLOCO DA ESCALA! Tudo o que está cá dentro mexeu-se por igual.
+    pop(); 
 
     verificarProgressoNave();
 }

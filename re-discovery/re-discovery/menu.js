@@ -22,12 +22,14 @@ const WIDE_WIDTH = 800;
 const WIDE_HEIGHT = 450;
 
 
-// ── Preload ───────────────────────────────────
+let somGlass; // Nova variável
+
 function preload() {
     bgMenu = loadImage('imagens/fundo.png');
     exitImg = loadImage('imagens/Exit.png');
     logo = loadImage('imagens/logo.png');
     somAmbienteNave = loadSound('sons/spaceship.mp3');
+    somGlass = loadSound('sons/glass.mp3'); // Carrega o som de partir
 
     preloadQuarto();
     preloadLivro();
@@ -41,8 +43,15 @@ function preload() {
     preloadTarefa6();
     preloadTarefa7();
     preloadTarefa8();
-    preloadMemoria(); // ADICIONA ISTO AQUI!
-    
+    preloadMemoria();
+}
+
+// Função para tocar o som de vidro rachado
+function tocarSomRacha() {
+    if (somGlass && somGlass.isLoaded()) {
+        somGlass.setVolume(0.8);
+        somGlass.play();
+    }
 }
 
 // ── Setup ─────────────────────────────────────
