@@ -104,7 +104,7 @@ function displayScore3() {
     fill(0, 255, 255);
     textAlign(LEFT);
     textSize(24);
-    text(`MEMORIES RECOVERED: ${score3} / ${GOAL3}`, 60, 60);
+    text(`MEMORIES RECOVERED: ${score3} / ${GOAL3}`, 80, 80);
 }
 
 function showFailScreenUniform() {

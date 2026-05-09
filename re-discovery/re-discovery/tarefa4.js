@@ -89,9 +89,9 @@ function displayHUD4() {
   textFont('Impact');
   fill(0, 255, 255);
   textSize(24);
-  text(`SUPERPOWER CHARGED: ${score4} / ${GOAL4}`, 60, 60);
+  text(`SUPERPOWER CHARGED: ${score4} / ${GOAL4}`, 170, 90);
   fill(255, 50, 50);
-  text(`SHIELDS: ${"❤️".repeat(lives4)}`, 60, 90);
+  text(`SHIELDS: ${"❤️".repeat(lives4)}`, 170, 120);
 }
 
 function showFailScreenUniform() {
