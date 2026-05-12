@@ -1,8 +1,6 @@
 let bgMenu, exitImg, logo;
 let gameState = "MENU";
 let startBtn, aboutBtn;
-
-// Apenas declaramos as variáveis aqui (as contas serão feitas mais tarde)
 let scaleRatioMenu, scaleRatioQuarto, scaleRatioNave;
 let naveNewW, naveNewH, menuNewW, menuNewH, quartoNewW, quartoNewH;
 
@@ -30,7 +28,7 @@ function preload() {
     exitImg = loadImage('imagens/Exit.png');
     logo = loadImage('imagens/logo.png');
     somAmbienteNave = loadSound('sons/spaceship.mp3');
-    somGlass = loadSound('sons/glass.mp3'); // Carrega o som de partir
+    somGlass = loadSound('sons/glass.mp3'); 
 
     preloadQuarto();
     preloadLivro();
@@ -55,13 +53,9 @@ function tocarSomRacha() {
     }
 }
 
-// ── Setup ─────────────────────────────────────
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    
-    // --- NOVO: Calculamos os fundos logo que o jogo arranca ---
     calcularTamanhosFundo(); 
-    
     calcularPopUpWide();
     initButtons();
     setupTarefa1();
@@ -74,7 +68,6 @@ function setup() {
     setupTarefa8();
 }
 
-// --- NOVA FUNÇÃO: Faz os cálculos matemáticos apenas quando o p5.js está pronto ---
 function calcularTamanhosFundo() {
     scaleRatioMenu = max(width / bgMenu.width, height / bgMenu.height);
     scaleRatioQuarto = max(width / bgQuartoImg.width, height / bgQuartoImg.height);
@@ -88,7 +81,6 @@ function calcularTamanhosFundo() {
     quartoNewH = bgQuartoImg.height * scaleRatioQuarto;
 }
 
-// ─── BOTÃO EXIT UNIVERSAL ─────────────────────────────
 function drawUniversalExit() {
     let px, py, pw;
 
@@ -97,15 +89,15 @@ function drawUniversalExit() {
     else if (gameState === "TAREFA2") { px = t2_popX; py = t2_popY; pw = t2_popW; }
     else { px = widePopX; py = widePopY; pw = widePopW; }
 
-    // --- CORREÇÃO: Variáveis uniformizadas ---
+    // Variáveis uniformizadas
     let size = width * 0.025; 
-    let ex = px + pw + 25; // Posição X com o ajuste de + 8        
+    let ex = px + pw + 25;        
     let ey = py;          
 
     push();
     imageMode(CENTER);
 
-    // Efeito de passar o rato por cima (Hover) usa exatamente as mesmas variáveis
+    // Efeito de passar o rato por cima (Hover) 
     if (dist(mouseX, mouseY, ex, ey) < size / 2) {
         cursor(HAND);
         tint(255, 150, 150); // Fica ligeiramente vermelho
@@ -121,9 +113,8 @@ function checkUniversalExit() {
     else if (gameState === "TAREFA2") { px = t2_popX; py = t2_popY; pw = t2_popW; }
     else { px = widePopX; py = widePopY; pw = widePopW; }
 
-    // --- CORREÇÃO: Variáveis copiadas do drawUniversalExit para baterem certo ---
     let size = width * 0.025; 
-    let ex = px + pw + 25; // Adicionado o + 8 que faltava!
+    let ex = px + pw + 25; 
     let ey = py;
 
     // Se o clique foi em cima da bola de Exit
@@ -184,11 +175,10 @@ function calcularPopUpWide() {
     widePopY = (height - widePopH) / 2;
 }
 
-//__ Reajustar tamanho ____________________________
+// Reajustar tamanho 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
     
-    // --- NOVO: Recalcula os fundos se o utilizador aumentar ou encolher a janela! ---
     calcularTamanhosFundo(); 
     
     calcularPopUpWide(); 
@@ -197,7 +187,7 @@ function windowResized() {
     windowResizedTarefa2();
 }
 
-// ── Botões responsivos ─────────────────────────
+// Botões responsivos 
 function initButtons() {
     startBtn = {
         x: width * 0.5, y: height * 0.6,
@@ -210,7 +200,7 @@ function initButtons() {
         w: width * 0.12, text: "ABOUT"
     };
 
-    // NOVOS: Botões para o ecrã final (Vitoria)
+    // Botões para o ecrã final
     restartBtnFinal = {
         x: width * 0.5, y: height * 0.75, // Posicionados no tapete do quarto
         baseW: width * 0.15, h: height * 0.08,
@@ -223,14 +213,11 @@ function initButtons() {
     };
 }
 
-// ── Loop principal ────────────────────────────
 function draw() {
     // Define o cursor padrão, a menos que uma transição de ruído esteja ativa
     if (transitionType !== "NOISE" && !isFading) cursor(ARROW);
 
-    // --- 1. DESENHAR O CENÁRIO ATUAL ---
-    // Importante: Desenhamos o estado ANTES da transição para que o fade 
-    // aconteça por cima da imagem que o utilizador está a ver.
+    // DESENHAR O CENÁRIO ATUAL 
     
     if (gameState === "MENU") {
         drawMenu();
@@ -266,17 +253,16 @@ function draw() {
         drawVitoriaScreen();
     }
 
-    // --- 2. ELEMENTOS DE UI SOBREPOSTOS ---
+    // ELEMENTOS DE UI SOBREPOSTOS 
     if (gameState.startsWith("TAREFA")) {
         drawUniversalExit();
     }
 
-    // --- 3. SISTEMA DE TRANSIÇÃO (A ÚLTIMA CAMADA) ---
-    // Esta função desenha o retângulo de transparência por cima de tudo o que foi feito acima
+    // SISTEMA DE TRANSIÇÃO 
     handleTransition();
 }
 
-// ── Menu ──────────────────────────────────────
+// MENU
 function drawMenu() {
     let sizelogo = windowWidth / 2600;
 
@@ -323,8 +309,7 @@ function drawButton(btn) {
     pop();
 }
 
-// ── Sistema Dinâmico de Transições ──────────────────
-// Atualiza a função goTo para silenciar a nave no final
+// Sistema Dinâmico de Transições
 function goTo(novoEstado, tipo = "NONE") {
     nextState = novoEstado;
     transitionType = tipo;
@@ -374,15 +359,14 @@ function handleTransition() {
             }
         }
         
-        // Em vez de desenhar um retângulo preto, vamos desenhar 
-        // uma película que escurece suavemente o que está por baixo.
+        // película que escurece suavemente o que está por baixo
         push();
         noStroke();
         fill(0, 0, 0, fadeAlpha); 
         rect(0, 0, width, height);
         pop();
     }
-    // 2. Transição: Estática de TV (Noise)
+    // Estática 
     else if (transitionType === "NOISE") {
         noiseCounter++;
         push();
@@ -404,7 +388,7 @@ function handleTransition() {
     }
 }
 
-// ── Input ─────────────────────────────────────
+// input do user
 function mousePressed() {
     if (transitionType !== "NONE" || isFading) return; 
 
@@ -446,7 +430,7 @@ function mousePressed() {
     else if (gameState === "TAREFA6") { mousePressedTarefa6(); }
     else if (gameState === "TAREFA7") { mousePressedTarefa7(); }
     else if (gameState === "TAREFA8") { mousePressedTarefa8(); }
-    else if (gameState === "VITORIA") { handleVitoriaClick(); } // <--- Esta função está no vitoria.js
+    else if (gameState === "VITORIA") { handleVitoriaClick(); } 
     else if (gameState === "MEMORIA") { handleMemoriaClick(); }
 }
 
@@ -494,18 +478,18 @@ function drawTaskInstructions(title, description) {
     textSize(40);
     text(title.toUpperCase(), WIDE_WIDTH / 2, WIDE_HEIGHT / 2 - 80);
 
-    // Descrição em Branco (sem neon para legibilidade)
+    // Descrição em Branco 
     drawingContext.shadowBlur = 0;
     fill(255);
     textSize(18);
     
-    // --- ADICIONA ESTA LINHA PARA EVITAR O BUG DO P5.JS ---
+    // debug
     textAlign(CENTER, TOP); 
     
     // Wrap do texto para não sair das bordas
     text(description, WIDE_WIDTH / 2 - 200, WIDE_HEIGHT / 2 - 30, 400, 150);
 
-    // --- DEPOIS VOLTA A PÔR AO CENTRO PARA O BOTÃO START ---
+    //volta ao centro
     textAlign(CENTER, CENTER);
 
     // Botão START
@@ -514,7 +498,7 @@ function drawTaskInstructions(title, description) {
     let btnW = 150;
     let btnH = 50;
 
-    // Detetar hover do rato (considerando a escala do pop-up)
+    // Detetar hover do rato 
     let vmX = (mouseX - widePopX) / (widePopW / WIDE_WIDTH);
     let vmY = (mouseY - widePopY) / (widePopH / WIDE_HEIGHT);
     
@@ -538,12 +522,10 @@ function drawTaskInstructions(title, description) {
 }
 
 function checkStartClick() {
-    // Calculamos a posição do rato relativa ao sistema 800x450
     let vmX = (mouseX - widePopX) / (widePopW / WIDE_WIDTH);
     let vmY = (mouseY - widePopY) / (widePopH / WIDE_HEIGHT);
     
-    // O botão está no centro (400) e a Y=325 (WIDE_HEIGHT/2 + 100)
-    // Largura 150 (metade=75) e Altura 50 (metade=25)
+   
     let btnX = 400;
     let btnY = 325;
     
@@ -551,7 +533,7 @@ function checkStartClick() {
 }
 
 
-// ── Ecrã About ──────────────────────────────────────
+// Ecrã About 
 function drawAboutScreen() {
     // Desenha o fundo do menu
     image(bgMenu, 0, 0, menuNewW, menuNewH);
@@ -565,7 +547,7 @@ function drawAboutScreen() {
     textAlign(CENTER, CENTER);
     textFont('Impact');
 
-    // Título Néon Ciano
+    // Título Neon Ciano
     drawingContext.shadowBlur = 15;
     drawingContext.shadowColor = color(0, 255, 255);
     fill(0, 255, 255);
@@ -577,17 +559,15 @@ function drawAboutScreen() {
     textFont('Futura');
     textStyle(NORMAL);
     fill(255);
-    textSize(max(18, width * 0.015)); // Tamanho responsivo, mas nunca menor que 18
-    textAlign(CENTER, TOP); // Alinha pelo topo para o wrap funcionar bem
+    textSize(max(18, width * 0.015)); 
+    textAlign(CENTER, TOP);
 
     let aboutText = "Re-Discovery is an interactive web experience that explores the intersection of music, narrative, and digital art, inspired by Daft Punk’s Discovery and the film Interstella 5555. The project’s core concept revolves around the tension between corporate control and individual identity, symbolized by the mind-control glasses that frame the player's view. As the player progresses through rhythmic challenges to recover lost fragments of memory, this visual barrier progressively cracks, representing the process of breaking a forced trance and reclaiming a stolen past. This work was created by Laura Patrício and Myrella Andrade for the Multimedia Communication (Comunicação Multimédia) course in the Design and Multimedia degree at the University of Coimbra.";
 
-    // Caixa delimitadora de texto (Wrap) para manter as margens curtas e centradas
     let textW = width * 0.55; 
     text(aboutText, width / 2 - textW / 2, height * 0.35, textW, height * 0.5);
     pop();
 
-    // Desenha o botão de voltar atrás
     drawAboutExitBtn();
 }
 
@@ -595,7 +575,7 @@ function drawAboutExitBtn() {
     // Posição no canto superior esquerdo
     let ex = width * 0.95; 
     let ey = height * 0.08; 
-    let size = width * 0.025; // O mesmo tamanho do teu exit universal
+    let size = width * 0.025; 
 
     push();
     imageMode(CENTER);
@@ -611,7 +591,7 @@ function drawAboutExitBtn() {
 }
 
 function pararTodosSonsTarefas() {
-    // Se for a vitória final (isFinalVictory é true), saímos da função sem parar nada!
+    // Se for a vitória final (isFinalVictory true) saimos da função sem parar nada
     if (isFinalVictory) return; 
 
     if (typeof som3 !== 'undefined' && som3 && som3.isPlaying()) som3.stop();
