@@ -4,7 +4,7 @@ let score4 = 0;
 let lives4 = 3; 
 const GOAL4 = 10;
 let tarefa4State = "INSTRUCTIONS";
-let som4; // Variável para a música
+let som4; 
 
 function preloadTarefa4() {
   bgImg4 = loadImage('imagens/tarefa4.png');
@@ -26,26 +26,22 @@ function drawTarefa4() {
   imageMode(CORNER);
   image(bgImg4, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
 
-  // ── LÓGICA DE ESTADOS (INSTRUÇÕES VS JOGO) ──
+  // estados state machine
   if (tarefa4State === "INSTRUCTIONS") {
-    // Mostra o ecrã de instruções uniformizado
     drawTaskInstructions(
         "Superheroes", 
         "CHARGE THE POWER. Click the energy spheres before they disappear. Each click charges your superpower, each miss weakens your shields."
     );
   } 
   else {
-    // --- TUDO O QUE ESTÁ AQUI DENTRO SÓ ACONTECE DEPOIS DE CLICAR NO START ---
     if (tarefa4State === 'PLAY') {
-      // ── GESTÃO DA MÚSICA ──
-      // A música agora só arranca porque o estado passou para PLAY
       if (som4 && som4.isLoaded() && !som4.isPlaying()) {
         som4.loop();
       }
 
       displayHUD4();
 
-      // Spawna círculos a cada 60 frames (aprox. 1 segundo, no ritmo da batida)
+      // Spawna círculos a cada 60 frames (aprox. 1 segundo no ritmo da batida)
       if (frameCount % 60 === 0 && circles4.length < 3) {
         circles4.push(new ClickCircle4());
       }
@@ -68,11 +64,10 @@ function drawTarefa4() {
         }
       }
 
-      // --- CONDIÇÃO DE VITÓRIA RESOLVIDA ---
       if (score4 >= GOAL4) {
       TarefaConcluida.super = true;
       concluirComMemoria("super");
-      resetGame4(false); // Mantém o som
+      resetGame4(false); 
     }
       
     } else if (tarefa4State === 'GAMEOVER') {
@@ -129,17 +124,13 @@ function showWinScreenUniform() {
 }
 
 function mousePressedTarefa4() {
-  // 1. Verificamos se estamos no ecrã de instruções
   if (tarefa4State === "INSTRUCTIONS") {
     if (checkStartClick()) {
       tarefa4State = "PLAY"; 
-      // Não precisamos de pôr a música a tocar aqui, porque o drawTarefa4()
-      // vai ver que o estado é "PLAY" e toca a música automaticamente.
     }
-    return; // Pára aqui para não clicar nos círculos acidentalmente!
+    return; //para n clickar nos circulos sem querer
   }
 
-  // 2. A lógica antiga (Clicar nos círculos) só funciona se o estado for PLAY
   if (tarefa4State === 'PLAY') {
     let virtualMouseX = (mouseX - widePopX) / (widePopW / WIDE_WIDTH);
     let virtualMouseY = (mouseY - widePopY) / (widePopH / WIDE_HEIGHT);
@@ -173,7 +164,7 @@ class ClickCircle4 {
     this.y = random(120, WIDE_HEIGHT - 100);
     this.innerR = 40;
     this.outerR = 150; 
-    // Ajustado para fechar em aproximadamente 60 frames (1 segundo), batendo com o ritmo
+    // Ajustado para fechar em 1s
     this.shrinkSpeed = (this.outerR - this.innerR) / 60; 
     this.isClicked = false;
   }

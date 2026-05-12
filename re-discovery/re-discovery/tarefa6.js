@@ -25,7 +25,6 @@ function setupTarefa6() {
 }
 
 function drawTarefa6() {
-  // ── EFEITO POP-UP ──
   push();
   imageMode(CENTER);
   image(bgNave, width / 2, height / 2, naveNewW, naveNewH);
@@ -42,7 +41,6 @@ function drawTarefa6() {
   imageMode(CORNER);
   image(bgImg6, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
 
-  // ── LÓGICA DE ESTADOS (INSTRUÇÕES VS JOGO) ──
   if (tarefa6State === "INSTRUCTIONS") {
     drawTaskInstructions(
         "Voyager", 
@@ -50,7 +48,6 @@ function drawTarefa6() {
     );
   } 
   else {
-    // --- LÓGICA ORIGINAL DO JOGO ---
     if (tarefa6State === "START") {
       drawOverlay6("VOYAGER", "HOLD MOUSE TO GUIDE ROCKET");
       drawRocket6(pathPoints6[0].x, pathPoints6[0].y);
@@ -70,7 +67,6 @@ function drawTarefa6() {
   pop(); 
 }
 
-// Updated Overlay to match uniform typography and neon style
 function drawOverlay6(title, subtitle) {
     fill(0, 0, 0, 180);
     rect(0, 0, WIDE_WIDTH, WIDE_HEIGHT);
@@ -79,21 +75,19 @@ function drawOverlay6(title, subtitle) {
     textAlign(CENTER, CENTER);
     textFont('Impact'); // Uniform font
     
-    // Check if it's a failure to apply Red Neon, otherwise use Cyan
     if (title === "FAILED") {
         drawingContext.shadowBlur = 15;
-        drawingContext.shadowColor = color(255, 0, 0); // Red shadow
+        drawingContext.shadowColor = color(255, 0, 0); 
         fill(255, 0, 0); // Red text
     } else {
         drawingContext.shadowBlur = 15;
-        drawingContext.shadowColor = color(0, 255, 255); // Cyan shadow
-        fill(0, 255, 255); // Cyan text
+        drawingContext.shadowColor = color(0, 255, 255);
+        fill(0, 255, 255); 
     }
     
-    textSize(WIDE_WIDTH * 0.08); // Scale text size to pop-up width[cite: 1]
+    textSize(WIDE_WIDTH * 0.08); 
     text(title, WIDE_WIDTH / 2, WIDE_HEIGHT / 2 - 30);
     
-    // Subtitle (Uniform white text)
     drawingContext.shadowBlur = 0;
     fill(255);
     textSize(WIDE_WIDTH * 0.03);
@@ -101,7 +95,6 @@ function drawOverlay6(title, subtitle) {
     pop();
 }
 
-// NEW: Uniform Win Screen Function added here for clarity
 function showWinScreenUniform() {
     fill(0, 0, 0, 200);
     rect(0, 0, WIDE_WIDTH, WIDE_HEIGHT);
@@ -110,7 +103,7 @@ function showWinScreenUniform() {
     textAlign(CENTER, CENTER);
     textFont('Impact');
     drawingContext.shadowBlur = 15;
-    drawingContext.shadowColor = color(0, 255, 100); // Green Neon[cite: 1, 2]
+    drawingContext.shadowColor = color(0, 255, 100); 
     
     fill(0, 255, 100);
     textSize(WIDE_WIDTH * 0.08); 
@@ -145,10 +138,9 @@ function updateGame6() {
       isDragging6 = false;
       TarefaConcluida.voyager = true; 
       
-      // --- A MUDANÇA ESTÁ AQUI ---
       setTimeout(() => {
           resetGame6(); // Limpa a tarefa para a próxima vez
-          concluirComMemoria("voyager"); // Chama o vídeo da memória correspondente!
+          concluirComMemoria("voyager"); // Chama o vídeo da memória correspondente
       }, 1500);
     }
     
@@ -162,7 +154,6 @@ function drawRocket6(x, y) {
 }
 
 function mousePressedTarefa6() {
-  // 1. Verificar clique no botão de instruções
   if (tarefa6State === "INSTRUCTIONS") {
     if (checkStartClick()) {
       tarefa6State = "START"; 
@@ -170,12 +161,11 @@ function mousePressedTarefa6() {
     return; // Impede interações com o foguetão antes de começar
   }
 
-  // 2. Lógica original de clique/arrasto (apenas se o jogo já começou)
   let virtualMouseX = (mouseX - widePopX) / (widePopW / WIDE_WIDTH);
   let virtualMouseY = (mouseY - widePopY) / (widePopH / WIDE_HEIGHT);
 
   if (tarefa6State === "START" || tarefa6State === "FAIL") {
-    // Verifica se clicou perto do ponto inicial para começar a arrastar
+    //começa a arrastar
     if (dist(virtualMouseX, virtualMouseY, pathPoints6[0].x, pathPoints6[0].y) < 30) {
       tarefa6State = "PLAYING";
       isDragging6 = true;

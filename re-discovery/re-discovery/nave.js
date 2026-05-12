@@ -13,7 +13,7 @@ let btnNave = {
     btnVeridis: false, btnVoyager: false, btnHarder: false, btnOne: false
 };
 
-// Flag anti-loop: impede verificarProgressoNave() de disparar goTo() em cada frame
+// antiloop debug
 let _missaoConcluida = false;
 
 // Dicionários para guardar as imagens carregadas
@@ -50,17 +50,17 @@ function drawNave() {
     imageMode(CORNER);
     image(bgNave, 0, 0);
 
-    // ─── LÓGICA DO VIDRO RACHADO ──────────────
+    // logica vidro
     let nivelVidroAtual = 0;
 
     if (personagensStatus.arpegius) nivelVidroAtual = 1; 
     if (personagensStatus.octave) nivelVidroAtual = 2;   
     if (personagensStatus.stella) nivelVidroAtual = 3;   
 
-    // --- NOVO: Detetar se a racha aumentou para tocar o som ---
+    // toca som se aumenta racha
     if (nivelVidroAtual > nivelVidroAnterior) {
-        tocarSomRacha(); // Chama a função que criámos no menu.js
-        nivelVidroAnterior = nivelVidroAtual; // Atualiza para não tocar em loop
+        tocarSomRacha(); 
+        nivelVidroAnterior = nivelVidroAtual; // nao tocar em loop
     }
 
     if (nivelVidroAtual > 0 && imgVidros[nivelVidroAtual]) {
@@ -69,7 +69,7 @@ function drawNave() {
         blendMode(BLEND);  
     }
 
-    // --- DESENHAR OS BOTÕES ---
+    // botoes
     drawBtnImagem(699, 805, btnNave.btnVoyager, TarefaConcluida.voyager, buttonLine["Voyager"], buttonHover["Voyager"], buttonConc["Voyager"]);
     drawBtnImagem(1090, 906, btnNave.btnCrescendolls, TarefaConcluida.crescendolls, buttonLine["Crescendolls"], buttonHover["Crescendolls"], buttonConc["Crescendolls"]);
     drawBtnImagem(1180, 909, btnNave.btnAerodynamic, TarefaConcluida.aerodynamic, buttonLine["Aerodynamic"], buttonHover["Aerodynamic"], buttonConc["Aerodynamic"]);
@@ -84,20 +84,16 @@ function drawNave() {
     verificarProgressoNave();
 }
 
-/**
- * Função desenhar os botões SVG com tamanhos automáticos e rato virtual
- */
+
 function drawBtnImagem(x, y, isUnlocked, isConcluded, imgLine, imgHover, imgConc) {
 
     let fatorAjuste = 1.22;
     let w = imgLine.width * fatorAjuste;
     let h = imgLine.height * fatorAjuste;
 
-    // --- CORREÇÃO AQUI: O Rato Virtual precisa de saber o centroX! ---
     let larguraEscalada = bgNave.width * scaleRatioNave;
     let centroX = (width - larguraEscalada) / 2;
 
-    // Subtraímos o centroX ao mouseX para compensar o empurrão do ecrã
     let virtualMouseX = (mouseX - centroX) / scaleRatioNave;
     let virtualMouseY = mouseY / scaleRatioNave;
     // ------------------------------------------------------------------
@@ -140,7 +136,7 @@ function configurarBotoesNave() {
     }
 }
 
-// Substitui a função verificarProgressoNave por esta
+
 function verificarProgressoNave() {
     if (_missaoConcluida) return; 
 
@@ -160,10 +156,9 @@ function verificarProgressoNave() {
         concluiu = true;
     }
     else if (personagemAtual === "STELLA" && TarefaConcluida.some && TarefaConcluida.one) {
-        // --- VITÓRIA TOTAL DETETADA ---
         destino = "VITORIA";
         concluiu = true;
-        isFinalVictory = true; // Ativa a flag para a música continuar em loop
+        isFinalVictory = true; // musica continua em loop pro fim
     }
 
     if (concluiu) {
@@ -177,20 +172,16 @@ function verificarProgressoNave() {
     }
 }
 
-// Lógica de clique na Nave com tamanhos automáticos e rato virtual
 function handleNaveClick() {
 
-    // --- CORREÇÃO AQUI: O Clique também precisa de saber o centroX! ---
     let larguraEscalada = bgNave.width * scaleRatioNave;
     let centroX = (width - larguraEscalada) / 2;
 
-    // Subtraímos o centroX ao mouseX
     let virtualMouseX = (mouseX - centroX) / scaleRatioNave;
     let virtualMouseY = mouseY / scaleRatioNave;
-    // ------------------------------------------------------------------
 
     function clickBtn(x, y, img) {
-        let fatorAjuste = 1.22; // Tem de ser igual ao do drawBtnImagem
+        let fatorAjuste = 1.22; 
         let w = img.width * fatorAjuste;
         let h = img.height * fatorAjuste;
 

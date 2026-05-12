@@ -38,11 +38,9 @@ function drawTarefa7() {
   translate(widePopX, widePopY);
   scale(widePopW / WIDE_WIDTH, widePopH / WIDE_HEIGHT);
 
-  // Certifique-se de que a variável bgImg7 está definida no seu preloadTarefa7
   imageMode(CORNER);
   image(bgImg7, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
 
-  // ── LÓGICA DE ESTADOS (INSTRUÇÕES VS JOGO) ──
   if (tarefa7State === "INSTRUCTIONS") {
     drawTaskInstructions(
         "Veridis Quo", 
@@ -50,7 +48,6 @@ function drawTarefa7() {
     );
   } 
   else {
-    // --- LÓGICA ORIGINAL DO JOGO ---
     drawUIRing();
     drawSyllables();
     drawConnectionLine();
@@ -74,7 +71,7 @@ function drawUIRing() {
 
 function drawSyllables() {
   textAlign(CENTER, CENTER);
-  textFont('Impact'); // Uniform Font
+  textFont('Impact'); 
   textSize(32);
   strokeWeight(2);
   
@@ -110,19 +107,17 @@ function drawConnectionLine() {
 
 function drawResultArea() {
   textAlign(CENTER, CENTER); 
-  textFont('Impact'); // Fonte uniforme para todo o sistema
+  textFont('Impact'); 
   let displayX = 660; 
   
   if (flashError) {
-    // Estilo de Falha Uniforme:
     push();
     drawingContext.shadowBlur = 15;
     drawingContext.shadowColor = color(255, 0, 0); // Brilho Neon Vermelho
     fill(255, 50, 50);
     
-    // Tamanho proporcional ao pop-up (WIDE_WIDTH * 0.08) para impacto visual
     textSize(WIDE_WIDTH * 0.08); 
-    text("FAILED", displayX, 230); // Texto em CAIXA ALTA uniforme
+    text("FAILED", displayX, 230); 
     pop();
     
     errorTimer--;
@@ -132,20 +127,18 @@ function drawResultArea() {
     }
     
   } else if (currentWord !== "") {
-    // Feedback visual de progresso (Neon Verde)[cite: 2]
     push();
     fill(0, 255, 100);
     drawingContext.shadowBlur = 15;
     drawingContext.shadowColor = color(0, 255, 100);
     textSize(40);
-    text(currentWord.toUpperCase(), displayX, 220); // UPPERCASE uniforme[cite: 1]
+    text(currentWord.toUpperCase(), displayX, 220); 
     pop();
   }
   
   drawingContext.shadowBlur = 0; // Reset do brilho para outros elementos
 }
 
-// Uniformized Win Screen for Tarefa 7[cite: 1]
 function showWinScreenUniform7() {
     fill(0, 0, 0, 200);
     rect(0, 0, WIDE_WIDTH, WIDE_HEIGHT);
@@ -169,15 +162,14 @@ function showWinScreenUniform7() {
 
 
 function mousePressedTarefa7() {
-  // 1. Verificar clique no botão de instruções
   if (tarefa7State === "INSTRUCTIONS") {
     if (checkStartClick()) {
-      tarefa7State = "PLAY"; // Define como PLAY para começar o jogo
+      tarefa7State = "PLAY";
     }
     return;
   }
 
-  // 2. Lógica original de início de conexão
+  //Lógica de início de conexão
   if (discoveryVisible) return;
 
   let virtualMouseX = (mouseX - widePopX) / (widePopW / WIDE_WIDTH);
@@ -196,7 +188,6 @@ function mousePressedTarefa7() {
 function mouseDraggedTarefa7() {
   if (discoveryVisible) return;
 
-  // Calculamos o rato virtual para colidir com as sílabas em miniatura
   let virtualMouseX = (mouseX - widePopX) / (widePopW / WIDE_WIDTH);
   let virtualMouseY = (mouseY - widePopY) / (widePopH / WIDE_HEIGHT);
 
@@ -226,15 +217,13 @@ function mouseReleasedTarefa7() {
       currentWord = "disquoveri";
       discoveryVisible = true;
       
-      // --- VITÓRIA E DESBLOQUEIO ---
       TarefaConcluida.veridis = true; 
       
-      // --- CONFLITO RESOLVIDO AQUI ---
       setTimeout(() => {
           resetAttempt(); 
           discoveryVisible = false;
-          tarefa7State = "INSTRUCTIONS"; // Reset da colega
-          concluirComMemoria("veridis"); // A tua chamada de vídeo
+          tarefa7State = "INSTRUCTIONS"; 
+          concluirComMemoria("veridis"); 
       }, 1500);
 
     } else {

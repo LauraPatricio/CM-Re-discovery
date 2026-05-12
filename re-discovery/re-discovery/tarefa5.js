@@ -6,7 +6,6 @@ let tarefa5State = "INSTRUCTIONS";
 const GOAL5 = 3;
 let winDelayTimer = 0; // Timer para o atraso de 5 segundos
 
-// Ajustadas ligeiramente para o nosso padrão 800x450 (eram para 900x500)
 let bX5 = 80;
 let bW5 = 186;
 let bH5 = 54;
@@ -14,7 +13,6 @@ let bY_positions5 = [88, 198, 306];
 
 function preloadTarefa5() {
   bgImg5 = loadImage('imagens/tarefa5.png');
-  // Carrega as 3 faixas sincronizadas
   tracks[0] = loadSound('sons/bass.mp3'); 
   tracks[1] = loadSound('sons/drums.mp3');
   tracks[2] = loadSound('sons/melody.mp3');
@@ -25,7 +23,7 @@ function setupTarefa5() {
   rings.push(new SyncRing(377, 225, color(31, 64, 153)));
   rings.push(new SyncRing(377, 334, color(0, 169, 127)));
 
-  // Inicia todas as faixas juntas em loop, mas com volume 0
+  // Inicia todas as faixas juntas em loop mas com volume 0
   for (let t of tracks) {
     t.setVolume(0);
     t.loop();
@@ -42,7 +40,6 @@ function drawTarefa5() {
   fill(0, 0, 0, 180);
   rect(0, 0, width, height); // Película escura
 
-  // ── ESCALA PARA O POP-UP WIDESCREEN ──
   push();
   translate(widePopX, widePopY);
   scale(widePopW / WIDE_WIDTH, widePopH / WIDE_HEIGHT);
@@ -50,16 +47,13 @@ function drawTarefa5() {
   imageMode(CORNER);
   image(bgImg5, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
 
-  // ── LÓGICA DE ESTADOS (INSTRUÇÕES VS JOGO) ──
   if (tarefa5State === "INSTRUCTIONS") {
-    // Mostra o ecrã de instruções uniformizado
     drawTaskInstructions(
         "Something About Us", 
         "RESONATE THE FREQUENCY. Click the instrument buttons when the rotating square aligns perfectly with the target. Sync all three to complete the melody."
     );
   } 
   else {
-    // --- TUDO O QUE ESTÁ AQUI DENTRO SÓ ACONTECE DEPOIS DE CLICAR NO START ---
     if (tarefa5State === 'PLAY') {
       displayHUD5();
       drawDebugButtons5();
@@ -68,7 +62,7 @@ function drawTarefa5() {
         rings[i].update();
         rings[i].show();
         
-        // Se o anel estiver sincronizado, aumenta o volume daquela faixa
+        // Se o anel estiver sincronizado aumenta o volume daquela faixa
         if (rings[i].isSynced) {
           tracks[i].setVolume(1.0);
         }
@@ -120,10 +114,10 @@ function showWinScreenUniform() {
     drawingContext.shadowColor = color(0, 255, 100);
     
     fill(0, 255, 100);
-    textSize(popW * 0.08); // Tamanho consistente com a Tarefa 1
+    textSize(popW * 0.08);
     text("IDENTITY RECOVERED", WIDE_WIDTH / 2, WIDE_HEIGHT / 2);
     
-    drawingContext.shadowBlur = 0; // Reset shadow
+    drawingContext.shadowBlur = 0; 
     textSize(popW * 0.03);
     fill(255);
     text("MEMORY SYNCED...", WIDE_WIDTH / 2, WIDE_HEIGHT / 2 + 60);
@@ -134,7 +128,7 @@ function mousePressedTarefa5() {
   if (tarefa5State === "INSTRUCTIONS") {
     if (checkStartClick()) {
       tarefa5State = "PLAY";
-      // INICIA OS LOOPS AQUI após o clique
+      //inicia a musica a 0 pra fcrem sincronizadas
       for (let t of tracks) {
         if (!t.isPlaying()) {
             t.setVolume(0);
@@ -145,7 +139,6 @@ function mousePressedTarefa5() {
     return;
   }
 
-  // 2. Lógica do jogo (Clicar nos botões para sincronizar os anéis)
   if (tarefa5State === 'PLAY') {
     let virtualMouseX = (mouseX - widePopX) / (widePopW / WIDE_WIDTH);
     let virtualMouseY = (mouseY - widePopY) / (widePopH / WIDE_HEIGHT);
@@ -164,8 +157,7 @@ function mousePressedTarefa5() {
 }
 
 function keyPressedTarefa5() {
-  // Agora o reset só funciona pelo rato ou sai sozinho após ganhar. 
-  // Esta função pode ficar vazia, ou servir para atalhos de debug.
+  // Esta função fica vazia ou servir para atalhos de debug
 }
 
 function stopAllTracks() {

@@ -25,9 +25,7 @@ function preloadMemoria() {
 function concluirComMemoria(tarefaKey) {
     gameState = "MEMORIA"; 
 
-    // --- VERIFICAÇÃO CRUCIAL DE VITÓRIA FINAL ---
-    // Se a tarefa 5 e a tarefa 8 já estiverem marcadas como concluídas,
-    // ativamos a flag global para impedir que a música pare no fim do vídeo.
+    //mostra video
     if (TarefaConcluida.some && TarefaConcluida.one) {
         isFinalVictory = true;
     }
@@ -51,7 +49,7 @@ function concluirComMemoria(tarefaKey) {
     }
 
     memoriaVideo.onended(() => {
-        // Se isFinalVictory for true, esta função no menu.js não fará nada!
+        // Se isFinalVictory for tru esta função no menu.js não faz nada
         pararTodosSonsTarefas(); 
         
         if (sonsExtraMemoria[currentMemoriaKey]) {
@@ -71,18 +69,15 @@ function concluirComMemoria(tarefaKey) {
 }
 
 function drawMemoriaScreen() {
-    // 1. Desenha o fundo da Nave por baixo
     push();
     imageMode(CENTER);
     image(bgNave, width / 2, height / 2, naveNewW, naveNewH);
     pop();
 
-    // 2. Película escura
     noStroke();
     fill(0, 0, 0, 180);
     rect(0, 0, width, height);
 
-    // 3. Área do vídeo com a escala unificada do menu.js
     push();
     translate(widePopX, widePopY);
     scale(widePopW / WIDE_WIDTH, widePopH / WIDE_HEIGHT);
@@ -91,7 +86,7 @@ function drawMemoriaScreen() {
         imageMode(CORNER);
         image(memoriaVideo, 0, 0, WIDE_WIDTH, WIDE_HEIGHT);
         
-        // Efeito Vignette (Sombra nas bordas)
+        // Efeito Vignette 
         let grad = drawingContext.createRadialGradient(WIDE_WIDTH/2, WIDE_HEIGHT/2, WIDE_HEIGHT * 0.2, WIDE_WIDTH/2, WIDE_HEIGHT/2, WIDE_WIDTH * 0.7);
         grad.addColorStop(0, 'rgba(0,0,0,0)');
         grad.addColorStop(1, 'rgba(0,0,0,0.95)');
@@ -103,7 +98,7 @@ function drawMemoriaScreen() {
     }
     pop();
 }
-// Ecrã de "Continuar" após o vídeo
+// NAO É USADA
 function _drawContinueButton(vW, vH) {
     // Escurece o último frame do vídeo ligeiramente
     noStroke();
@@ -117,8 +112,7 @@ function _drawContinueButton(vW, vH) {
     drawingContext.shadowBlur = 15;
     drawingContext.shadowColor = color(0, 255, 100);
     
-    // --- CORREÇÃO AQUI ---
-    // Descomentei o fill para o texto não desaparecer
+    // fill para o texto não desaparecer
     fill(0, 255, 100); 
     textSize(vW * 0.08);
     text("CLICA PARA CONTINUAR", vW / 2, vH / 2);
@@ -126,16 +120,15 @@ function _drawContinueButton(vW, vH) {
     pop();
 }
 
-// ── Input ─────────────────────────────────────
+// Input do user
 function handleMemoriaClick() {
-    // O clique APENAS funciona se o vídeo já tiver terminado
     if (memoriaEnded) {
         pararMemoria();
         goTo(memoriaNextState);
     }
 }
 
-// ── Cleanup ───────────────────────────────────
+// para memoria
 function pararMemoria() {
     if (memoriaVideo) {
         memoriaVideo.stop();
